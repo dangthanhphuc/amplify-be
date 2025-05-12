@@ -1,0 +1,26 @@
+{
+    "name": "amplify-be",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "@aws-amplify/backend": "^1.16.1",
+        "@aws-amplify/backend-cli": "^1.7.1",
+        "@types/node": "^22.15.17",
+        "aws-sdk": "^2.1692.0",
+        "constructs": "^10.4.2",
+        "esbuild": "^0.25.4",
+        "tsx": "^4.19.4",
+        "typescript": "^5.8.3"
+    },
+    "dependencies": {
+        "amplify-be": "file:",
+        "aws-amplify": "^6.14.4"
+    }
+}

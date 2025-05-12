@@ -1,0 +1,70 @@
+import { defineBackend } from '@aws-amplify/backend';
+import { auth } from './auth/resource';
+// import { data } from './data/resource';
+import { aiAgentGetMethodFnc } from './functions/agents/resources';
+import { createRestApiStack } from './stacks/rest-api-stack';
+import { signUpPostMethodFnc } from './functions/auth/signup/resources';
+import { signInPostMethodFnc } from './functions/auth/signin/resources';
+import { confirmSignUpPostMethodFnc } from './functions/auth/confirmSignUp/resources';
+import { signInWithRedirectGoogleFnc } from './functions/auth/signInWithRedirectGoogle/resources';
+import { signInWithRedirectFacebookFnc } from './functions/auth/signInWithRedirectFacebook/resources';
+import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { getTokenByCodeFnc } from './functions/auth/token/resources';
+// import { createAuroraMySQLStack } from './stacks/aurora-mysql-stack';
+
+// Define backend with Aurora RDS integration
+export const backend = defineBackend({
+  auth,
+  // data,
+  aiAgentGetMethodFnc,
+  signUpPostMethodFnc,
+  signInPostMethodFnc,
+  confirmSignUpPostMethodFnc,
+  signInWithRedirectFacebookFnc,
+  signInWithRedirectGoogleFnc,
+  getTokenByCodeFnc
+});
+
+// Create REST API stack
+const { outputs: restApiOutputs } = createRestApiStack(backend);
+
+// // Create Aurora MySQL stack
+// const { outputs: auroraOutputs } = createAuroraMySQLStack(backend);
+
+// Configure OAuth settings for the User Pool Client
+const { cfnResources } = backend.auth.resources;
+if (cfnResources.cfnUserPoolClient) {
+  cfnResources.cfnUserPoolClient.allowedOAuthFlows = ['code']; // Options: 'code', 'implicit', or both
+  cfnResources.cfnUserPoolClient.allowedOAuthFlowsUserPoolClient = true;
+  cfnResources.cfnUserPoolClient.allowedOAuthScopes = ['email', 'openid', 'profile'];
+
+  cfnResources.cfnUserPoolClient.explicitAuthFlows = [
+    'ALLOW_USER_PASSWORD_AUTH',
+    'ALLOW_REFRESH_TOKEN_AUTH',
+    'ALLOW_USER_SRP_AUTH',
+    'ALLOW_CUSTOM_AUTH'
+  ];
+}
+
+const { cfnUserPool } = backend.auth.resources.cfnResources;
+cfnUserPool.policies = {
+  passwordPolicy: {
+    minimumLength: 8,
+    requireLowercase: false,
+    requireNumbers: false,
+    requireSymbols: false,
+    requireUppercase: false
+  },
+};
+backend.aiAgentGetMethodFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    'bedrock:ListAgents',
+    'bedrock:GetAgent'
+  ],
+  resources: ["*"]
+}));
+// Add outputs from stacks to configuration
+backend.addOutput(restApiOutputs);
+// backend.addOutput(auroraOutputs);
+

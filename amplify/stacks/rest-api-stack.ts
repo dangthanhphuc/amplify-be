@@ -67,6 +67,10 @@ export function createRestApiStack(backend: any) {
     backend.getTokenByCodeFnc.resources.lambda
   );
 
+  const lambdaForGetAgents = new LambdaIntegration(
+    backend.getAgentsFnc.resources.lambda
+  )
+
   const methodOptionsForUsers : MethodOptions = {
     authorizationType: AuthorizationType.COGNITO,
     authorizer: cognitoAuth,
@@ -95,10 +99,9 @@ export function createRestApiStack(backend: any) {
 
   
 
-  // Tạo tài nguyên auth MỘT LẦN
+  // Tạo auth resource
   const authResource = restAPI.root.addResource("auth");
 
-  // Thêm các tài nguyên con vào tài nguyên auth
   const signupResource = authResource.addResource("signup");
   signupResource.addMethod("POST", lambdaForSignUp);
 
@@ -108,16 +111,19 @@ export function createRestApiStack(backend: any) {
   const confirmSignUpResource = authResource.addResource("confirm-signup");
   confirmSignUpResource.addMethod("POST", lambdaForConfirmSignUp);
 
-  // Add Google OAuth redirect resource
   const signInWithRedirectGoogleResource = authResource.addResource("signInWithRedirectGoogle");
   signInWithRedirectGoogleResource.addMethod("GET", lambdaForSignInWithRedirectGoogle);
 
-  // Add Facebook OAuth redirect resource
   const signInWithRedirectFacebookResource = authResource.addResource("signInWithRedirectFacebook");
   signInWithRedirectFacebookResource.addMethod("GET", lambdaForSignInWithRedirectFacebook);
 
   const getTokenByCodeResource = authResource.addResource("getTokenByCode");
   getTokenByCodeResource.addMethod("GET", lambdaForGetTokenByCode);
+
+  // Tạo agents resource
+  const agentsResource = restAPI.root.addResource("agents");
+  agentsResource.addMethod("GET", lambdaForGetAgents);
+
 
   // Return the REST API and outputs for use in the main backend.ts file
   return {

@@ -5,16 +5,9 @@
         "user_pool_client_id": "dkveckahuancl592ev0r16ibf",
         "identity_pool_id": "us-east-1:6304ecd3-e344-4c2f-9689-452a7ad31250",
         "mfa_methods": [],
-        "standard_required_attributes": [
-            "email",
-            "name"
-        ],
-        "username_attributes": [
-            "email"
-        ],
-        "user_verification_types": [
-            "email"
-        ],
+        "standard_required_attributes": ["email", "name"],
+        "username_attributes": ["email"],
+        "user_verification_types": ["email"],
         "groups": [{
                 "USERS": {
                     "precedence": 0
@@ -40,23 +33,14 @@
             "require_uppercase": false
         },
         "oauth": {
-            "identity_providers": [
-                "GOOGLE",
-                "FACEBOOK"
-            ],
+            "identity_providers": ["GOOGLE", "FACEBOOK"],
             "redirect_sign_in_uri": [
                 "http://localhost:3000/auth",
                 "https://google.com"
             ],
-            "redirect_sign_out_uri": [
-                "http://localhost:3000/logout"
-            ],
+            "redirect_sign_out_uri": ["http://localhost:3000/logout"],
             "response_type": "code,implicit",
-            "scopes": [
-                "email",
-                "openid",
-                "profile"
-            ],
+            "scopes": ["email", "openid", "profile"],
             "domain": "https://6ebbeb9af207e4b82267.auth.us-east-1.amazoncognito.com"
         },
         "unauthenticated_identities_enabled": true

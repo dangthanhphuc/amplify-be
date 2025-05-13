@@ -1,6 +1,6 @@
 import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
-// import { data } from './data/resource';
+import { data } from './data/resource';
 import { aiAgentGetMethodFnc } from './functions/agents/resources';
 import { createRestApiStack } from './stacks/rest-api-stack';
 import { signUpPostMethodFnc } from './functions/auth/signup/resources';
@@ -10,19 +10,21 @@ import { signInWithRedirectGoogleFnc } from './functions/auth/signInWithRedirect
 import { signInWithRedirectFacebookFnc } from './functions/auth/signInWithRedirectFacebook/resources';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { getTokenByCodeFnc } from './functions/auth/token/resources';
+import { getAgentsFnc } from './functions/agents/get/resources';
 // import { createAuroraMySQLStack } from './stacks/aurora-mysql-stack';
 
 // Define backend with Aurora RDS integration
 export const backend = defineBackend({
   auth,
-  // data,
+  data,
   aiAgentGetMethodFnc,
   signUpPostMethodFnc,
   signInPostMethodFnc,
   confirmSignUpPostMethodFnc,
   signInWithRedirectFacebookFnc,
   signInWithRedirectGoogleFnc,
-  getTokenByCodeFnc
+  getTokenByCodeFnc,
+  getAgentsFnc
 });
 
 // Create REST API stack
@@ -56,7 +58,8 @@ cfnUserPool.policies = {
     requireUppercase: false
   },
 };
-backend.aiAgentGetMethodFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+
+backend.getAgentsFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
   actions: [
     'bedrock:ListAgents',
@@ -64,6 +67,7 @@ backend.aiAgentGetMethodFnc.resources.lambda.addToRolePolicy(new PolicyStatement
   ],
   resources: ["*"]
 }));
+
 // Add outputs from stacks to configuration
 backend.addOutput(restApiOutputs);
 // backend.addOutput(auroraOutputs);

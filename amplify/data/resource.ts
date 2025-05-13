@@ -54,12 +54,6 @@ const sqlSchema = generatedSqlSchema
 // Update client types
 export type Schema = ClientSchema<typeof sqlSchema>;
 
-// export const data = defineData({
-//   schema: sqlSchema,
-//   authorizationModes: {
-//     defaultAuthorizationMode: "apiKey",
-//     apiKeyAuthorizationMode: {
-//       expiresInDays: 30,
-//     },
-//   },
-// });
+export const data = defineData({
+  schema: sqlSchema,
+});

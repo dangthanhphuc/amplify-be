@@ -2,9 +2,14 @@
 import type { APIGatewayProxyHandler } from "aws-lambda";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { env } from "$amplify/env/signUpPostMethodFnc";
-
+import { RDSDataClient } from "@aws-sdk/client-rds-data";
 
 const cognito = new CognitoIdentityServiceProvider();
+
+// const rdsClient = new RDSDataClient({
+//     region: "us-east-1"
+// });
+
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
@@ -15,7 +20,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 message: "No request body",
             }),
         };
-    } 
+    }
 
     const requestBody = JSON.parse(event.body);
     const { email, password, name } = requestBody;

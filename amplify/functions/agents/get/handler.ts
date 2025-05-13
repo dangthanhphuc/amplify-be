@@ -27,37 +27,37 @@ export const handler : APIGatewayProxyHandler = async (event) => {
 
         const response = await bedrockClient.send(command);
 
-        const result = rdsClient.send(new ExecuteStatementCommand({
-            resourceArn: process.env.RDS_ARN,
-            secretArn: process.env.RDS_SECRET_ARN,
-            sql: "SELECT * FROM agent_categories",
-            database: process.env.RDS_DATABASE,
-            includeResultMetadata: true
-        }));
+        // const result = rdsClient.send(new ExecuteStatementCommand({
+        //     resourceArn: process.env.RDS_ARN,
+        //     secretArn: process.env.RDS_SECRET_ARN,
+        //     sql: "SELECT * FROM agent_categories",
+        //     database: process.env.RDS_DATABASE,
+        //     includeResultMetadata: true
+        // }));
 
-        const records = (await result).records || [];
-        const columnMetadata = (await result).columnMetadata || [];
+        // const records = (await result).records || [];
+        // const columnMetadata = (await result).columnMetadata || [];
 
-        const agentCategories = records.map(record => {
-            const item : DynamicObject = {};
-            columnMetadata.forEach((column : ColumnMetadata, index : number) => {
-                const columnName = column.name || `column_${index}`;
-                // Xử lý các loại dữ liệu khác nhau
-                const value = record[index].stringValue !== undefined ? record[index].stringValue :
-                              record[index].longValue !== undefined ? record[index].longValue :
-                              record[index].booleanValue !== undefined ? record[index].booleanValue :
-                              record[index].doubleValue !== undefined ? record[index].doubleValue :
-                              null;
-                item[columnName] = value;
-            });
-            return item;
-        });
+        // const agentCategories = records.map(record => {
+        //     const item : DynamicObject = {};
+        //     columnMetadata.forEach((column : ColumnMetadata, index : number) => {
+        //         const columnName = column.name || `column_${index}`;
+        //         // Xử lý các loại dữ liệu khác nhau
+        //         const value = record[index].stringValue !== undefined ? record[index].stringValue :
+        //                       record[index].longValue !== undefined ? record[index].longValue :
+        //                       record[index].booleanValue !== undefined ? record[index].booleanValue :
+        //                       record[index].doubleValue !== undefined ? record[index].doubleValue :
+        //                       null;
+        //         item[columnName] = value;
+        //     });
+        //     return item;
+        // });
 
         return {
             statusCode: 200,
             body: JSON.stringify({
                 message: 'Hello from the API function!',
-                body: agentCategories
+                body: response
             }),
         }
     } catch (error : any) {

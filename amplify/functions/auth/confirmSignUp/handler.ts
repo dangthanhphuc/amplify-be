@@ -18,14 +18,27 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const requestBody = JSON.parse(event.body);
     const { email, confirmationCode } = requestBody;
 
+    // Confirm signup for the user
     const result = await cognito.confirmSignUp({
         ClientId: env.USER_POOL_CLIENT_ID,
         Username: email,
         ConfirmationCode: confirmationCode
       }).promise();
+
+    // Add user to the USERS group
+    await cognito.adminAddUserToGroup({
+      GroupName: "USERS",
+      UserPoolId: env.USER_POOL_ID,
+      Username: email,
+
+    }).promise();
+
     return {
       statusCode: 200,
-      body: "Confirm email signup successfully"
+      body: JSON.stringify({
+        message: "User confirmed successfully",
+        result,
+      })
     };
   } catch (error: any) {
     return {

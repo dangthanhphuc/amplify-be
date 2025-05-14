@@ -11,7 +11,7 @@ import { signInWithRedirectFacebookFnc } from './functions/auth/signInWithRedire
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { getTokenByCodeFnc } from './functions/auth/token/resources';
 import { getAgentsFnc } from './functions/agents/get/resources';
-// import { createAuroraMySQLStack } from './stacks/aurora-mysql-stack';
+import { CfnDBCluster } from 'aws-cdk-lib/aws-rds';
 
 // Define backend with Aurora RDS integration
 export const backend = defineBackend({
@@ -32,6 +32,8 @@ const { outputs: restApiOutputs } = createRestApiStack(backend);
 
 // // Create Aurora MySQL stack
 // const { outputs: auroraOutputs } = createAuroraMySQLStack(backend);
+
+// Configure RDS clusterIdentifier
 
 // Configure OAuth settings for the User Pool Client
 const { cfnResources } = backend.auth.resources;
@@ -68,7 +70,19 @@ backend.getAgentsFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   resources: ["*"]
 }));
 
+backend.getAgentsFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    'rds-data:ExecuteStatement',
+    'rds-data:BatchExecuteStatement',
+    'rds-data:BeginTransaction',
+    'rds-data:CommitTransaction',
+    'rds-data:RollbackTransaction',
+    'secretsmanager:GetSecretValue'
+  ],
+  resources: ["*"]
+}));
+
 // Add outputs from stacks to configuration
 backend.addOutput(restApiOutputs);
 // backend.addOutput(auroraOutputs);
-

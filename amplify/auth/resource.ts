@@ -26,8 +26,7 @@ export const auth = defineAuth({
       },
       callbackUrls: [
         'http://localhost:3000',
-        'https://5d6vfgww47.execute-api.us-east-1.amazonaws.com/dev/auth/getTokenByCode',
-        'https://teg87pgd5m.execute-api.us-east-1.amazonaws.com/dev/auth/getTokenByCode'
+        'https://5d6vfgww47.execute-api.us-east-1.amazonaws.com/dev/auth/getTokenByCode', // Production
       ],
       logoutUrls: ['http://localhost:3000/logout']
     }

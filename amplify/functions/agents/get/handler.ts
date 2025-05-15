@@ -4,6 +4,8 @@ import { BedrockAgentClient, ListAgentsCommand } from "@aws-sdk/client-bedrock-a
 import {RDSDataClient, ExecuteStatementCommand, ColumnMetadata} from "@aws-sdk/client-rds-data";
 import {SecretsManagerClient, GetSecretValueCommand} from "@aws-sdk/client-secrets-manager";
 import {env} from "$amplify/env/getAgentsFnc";
+import { generateClient } from 'aws-amplify/data';
+import { Schema } from '../../../data/resource';
 
 const bedrockClient = new BedrockAgentClient({
     region: "us-east-1"
@@ -24,24 +26,12 @@ interface DynamicObject {
 
 export const handler : APIGatewayProxyHandler = async (event) => {
     try {
-        // const input = {
-        //     maxResults: Number(5), // tests
-        // };
-        //
-        // const command = new ListAgentsCommand(input);
-
-        // const response = await bedrockClient.send(command);
 
         const secretResponse = await secretManagerClient.send(
             new GetSecretValueCommand({
                 SecretId: secretName
             })
         );
-
-        console.log("resourceArn", env.RDS_ARN)
-        console.log("Secret ARN:", secretResponse.ARN);
-        console.log("Secret Value:", env.RDS_DATABASE);
-
 
         const result = rdsClient.send(new ExecuteStatementCommand({
             resourceArn: env.RDS_ARN,
@@ -73,7 +63,10 @@ export const handler : APIGatewayProxyHandler = async (event) => {
             statusCode: 200,
             body: JSON.stringify({
                 message: 'Hello from the API function!',
-                body: agentCategories
+                body: {
+                    agentCategories: agentCategories,
+                    value: records // Test
+                }
             }),
         }
     } catch (error : any) {

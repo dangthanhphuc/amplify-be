@@ -1,10 +1,9 @@
 
 import type { APIGatewayProxyHandler } from "aws-lambda";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
-import { env } from "$amplify/env/signInWithRedirectGoogleFnc";
+import { env } from "$amplify/env/getTokenByCodeFnc";
 
-
-const cognito = new CognitoIdentityServiceProvider();
+// const cognito = new CognitoIdentityServiceProvider();
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
@@ -13,8 +12,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     // Tạo URL redirect đến Google OAuth
       const domain = env.COGNITO_DOMAIN;
-      const clientId = env.USER_POOL_CLIENT_ID;
-      const redirectUri = encodeURIComponent(env.CALLBACK_URL || '');
+      // const clientId = String(process.env.USER_POOL_CLIENT_ID);
+      // const redirectUri = encodeURIComponent(env.CALLBACK_URL || '');
 
     if(!code) {
         return {
@@ -30,9 +29,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const tokenEndpoint = `${domain}/oauth2/token`;
     const params = new URLSearchParams();
     params.append('grant_type', 'authorization_code');
-    params.append('client_id', clientId);
     params.append('code', code);
-    params.append('redirect_uri', decodeURIComponent(redirectUri));
 
     // Call the token endpoint
     const response = await fetch(tokenEndpoint, {

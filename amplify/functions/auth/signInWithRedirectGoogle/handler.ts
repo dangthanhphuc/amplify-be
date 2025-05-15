@@ -9,10 +9,12 @@ const cognito = new CognitoIdentityServiceProvider();
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
 
+    const redirectUriParam = event.queryStringParameters?.redirectUri;
+
     // Tạo URL redirect đến Google OAuth
       const domain = env.COGNITO_DOMAIN;
       const clientId = env.USER_POOL_CLIENT_ID;
-      const redirectUri = encodeURIComponent(env.CALLBACK_URL || '');
+      const redirectUri = encodeURIComponent(redirectUriParam || '');
 
       const googleAuthUrl = `${domain}/oauth2/authorize?` +
       `identity_provider=Google&response_type=code&client_id=${clientId}` +

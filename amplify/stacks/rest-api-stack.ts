@@ -8,6 +8,7 @@ import {
   RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import { Stack } from "aws-cdk-lib";
+import { createLambdaIntegrationResponse } from "../helper/lambdaResponse";
 
 /**
  * Creates and configures the REST API stack
@@ -29,8 +30,9 @@ export function createRestApiStack(backend: any) {
     defaultCorsPreflightOptions: {
       allowOrigins: Cors.ALL_ORIGINS, // Restrict this to domains you trust
       allowMethods: Cors.ALL_METHODS, // Specify only the methods you need to allow
-      allowHeaders: ["Content-Type", "Authorization", "X-Amz-Date", "X-Api-Key", "X-Requested-With"] // Specify only the headers you need to allow
-    }
+      allowHeaders: Cors.DEFAULT_HEADERS, // Specify only the headers you need to allow
+    },
+    
   });
 
   // create a new Cognito User Pools authorizer
@@ -50,23 +52,23 @@ export function createRestApiStack(backend: any) {
   const lambdaForSignIn = new LambdaIntegration(
     backend.signInPostMethodFnc.resources.lambda
   );
-  const lambdaForConfirmSignUp = new LambdaIntegration(
+  const lambdaForConfirmSignUp = createLambdaIntegrationResponse(
     backend.confirmSignUpPostMethodFnc.resources.lambda
   );
 
-  const lambdaForSignInWithRedirectGoogle = new LambdaIntegration(
+  const lambdaForSignInWithRedirectGoogle = createLambdaIntegrationResponse(
     backend.signInWithRedirectGoogleFnc.resources.lambda
   );
 
-  const lambdaForSignInWithRedirectFacebook = new LambdaIntegration(
+  const lambdaForSignInWithRedirectFacebook = createLambdaIntegrationResponse(
     backend.signInWithRedirectFacebookFnc.resources.lambda
   );
 
-  const lambdaForGetTokenByCode = new LambdaIntegration(
+  const lambdaForGetTokenByCode = createLambdaIntegrationResponse(
     backend.getTokenByCodeFnc.resources.lambda
   );
 
-  const lambdaForGetAgents = new LambdaIntegration(
+  const lambdaForGetAgents = createLambdaIntegrationResponse(
     backend.getAgentsFnc.resources.lambda
   )
 

@@ -8,6 +8,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   try {
 
     const redirectUriParam = event.queryStringParameters?.redirectUri;
+    const clientType = event.queryStringParameters?.clientType || 'web'; // 'web' hoặc 'mobile'
 
     // Tạo URL redirect đến Facebook OAuth
     const domain = env.COGNITO_DOMAIN;
@@ -21,7 +22,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         `&redirect_uri=${redirectUri}&scope=email+profile`;
 
       return {
-        statusCode: 302, 
+        statusCode: clientType === 'mobile' ? 200 : 302, // Redirect
         headers: {
           Location: facebookAuthUrl,
           "Access-Control-Allow-Origin": "*",

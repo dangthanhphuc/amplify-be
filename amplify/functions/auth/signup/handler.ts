@@ -41,11 +41,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     return {
       statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",  // Hoặc "http://localhost:3000" để an toàn hơn
-        "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Amz-Date,X-Api-Key",
-        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS"
-      },
+      // headers: {
+      //   "Access-Control-Allow-Origin": "*",  // Hoặc "http://localhost:3000" để an toàn hơn
+      //   "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Amz-Date,X-Api-Key",
+      //   "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS"
+      // },
       body: JSON.stringify({
         result
       })
@@ -53,11 +53,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   } catch (error : any) {
     return {
       statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",  // Hoặc "http://localhost:3000" để an toàn hơn
-        "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Amz-Date,X-Api-Key",
-        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS"
-      },
+      // headers: {
+      //   "Access-Control-Allow-Origin": "*",  // Hoặc "http://localhost:3000" để an toàn hơn
+      //   "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Amz-Date,X-Api-Key",
+      //   "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS"
+      // },
       body: JSON.stringify({
         message: "Error signing up",
         error: error.message,

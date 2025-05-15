@@ -9,6 +9,7 @@ import {
 } from "aws-cdk-lib/aws-apigateway";
 import { Stack } from "aws-cdk-lib";
 import { createLambdaIntegrationResponse } from "../helper/lambdaResponse";
+import { auth } from "../auth/resource";
 
 /**
  * Creates and configures the REST API stack
@@ -102,6 +103,7 @@ export function createRestApiStack(backend: any) {
 
   // Tạo auth resource
   const authResource = restAPI.root.addResource("auth");
+
 
   const signupResource = authResource.addResource("signup");
   signupResource.addMethod("POST", lambdaForSignUp);

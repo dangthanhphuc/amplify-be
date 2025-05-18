@@ -3,13 +3,13 @@ import type { APIGatewayProxyHandler } from "aws-lambda";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { env } from "$amplify/env/signInWithRedirectGoogleFnc";
 
-
 const cognito = new CognitoIdentityServiceProvider();
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
 
     const redirectUriParam = event.queryStringParameters?.redirectUri;
+    const clientType = event.queryStringParameters?.clientType || 'web'; // 'web' hoặc 'mobile'
 
     // Tạo URL redirect đến Google OAuth
       const domain = env.COGNITO_DOMAIN;
@@ -21,7 +21,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       `&redirect_uri=${redirectUri}&scope=email+profile`;
     
       return {
-        statusCode: 302,  // Redirect
+        statusCode: clientType === 'mobile' ? 200 : 302, // Redirect
         headers: {
           'Location': googleAuthUrl,
           'Access-Control-Allow-Origin': '*',

@@ -1,22 +1,13 @@
 
 import type {APIGatewayProxyHandler} from 'aws-lambda';
-import { BedrockAgentClient, ListAgentsCommand } from "@aws-sdk/client-bedrock-agent";
-import {RDSDataClient, ExecuteStatementCommand, ColumnMetadata} from "@aws-sdk/client-rds-data";
-import {SecretsManagerClient, GetSecretValueCommand} from "@aws-sdk/client-secrets-manager";
+import { BedrockAgentClient } from "@aws-sdk/client-bedrock-agent";
+import { ExecuteStatementCommand, ColumnMetadata} from "@aws-sdk/client-rds-data";
 import {env} from "$amplify/env/getAgentsFnc";
-import { generateClient } from 'aws-amplify/data';
-import { Schema } from '../../../data/resource';
+import { rdsClient } from '../../../utils/rdsClient';
+import { getSecret } from '../../../utils/secretManager';
+import { getBedrockAgents } from '../../../utils/bedrockClient';
 
 const bedrockClient = new BedrockAgentClient({
-    region: "us-east-1"
-});
-
-const secretName = "prod/RDS_SECRET_ARN";
-const secretManagerClient = new SecretsManagerClient({
-    region: "us-east-1"
-});
-
-const rdsClient = new RDSDataClient({
     region: "us-east-1"
 });
 
@@ -27,18 +18,38 @@ interface DynamicObject {
 export const handler : APIGatewayProxyHandler = async (event) => {
     try {
 
-        const secretResponse = await secretManagerClient.send(
-            new GetSecretValueCommand({
-                SecretId: secretName
-            })
-        );
+        // 1. Lấy danh sách agents từ Bedrock (Chưa xử lý nextToken)
+        const maxResults = event.queryStringParameters?.maxResults;
+        const nextToken = event.queryStringParameters?.nextToken;
+        if (!maxResults) 
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    message: 'Missing maxResults parameter',
+                }),
+            };
+        const bedrockResponse = await getBedrockAgents(Number(maxResults), nextToken);
 
+        // 2. Lấy secret để truy cập RDS
+        const secretResponse = await getSecret("prod/RDS_SECRET_ARN");
+        
+
+        // 3. Lưu từng agent vào RDS (giả sử bảng agents có cột id, name, description)
         const result = rdsClient.send(new ExecuteStatementCommand({
             resourceArn: env.RDS_ARN,
             secretArn: secretResponse.ARN,
-            sql: "SELECT * FROM agent_categories",
             database: env.RDS_DATABASE,
-            includeResultMetadata: true
+            includeResultMetadata: true,
+            sql: `
+                INSERT INTO agents (id, name, description)
+                VALUES (:id, :name, :desc)
+                ON DUPLICATE KEY UPDATE name = :name, description = :desc
+            `,
+            parameters: [
+                { name: "id", value: { stringValue:  "" } },
+                { name: "name", value: { stringValue: "" } },
+                { name: "desc", value: { stringValue:  "" } }
+            ]
         }));
 
         const records = (await result).records || [];

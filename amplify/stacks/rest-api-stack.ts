@@ -41,11 +41,6 @@ export function createRestApiStack(backend: any) {
     cognitoUserPools: [backend.auth.resources.userPool],
   });
 
-  // create a new Lambda integration
-  const lambdaIntegrationForAiAgentGetMethod = new LambdaIntegration(
-    backend.aiAgentGetMethodFnc.resources.lambda
-  );
-
   const lambdaForSignUp = new LambdaIntegration(
     backend.signUpPostMethodFnc.resources.lambda
   );
@@ -91,15 +86,6 @@ export function createRestApiStack(backend: any) {
     authorizationScopes: ["ADMINS"]
   };
 
-  // API Gateway method for the request to /ai-agents
-  const aiAgents = restAPI.root.addResource("ai-agents");
-  aiAgents.addMethod("GET", lambdaIntegrationForAiAgentGetMethod, {
-    authorizationType: AuthorizationType.COGNITO,
-    authorizer: cognitoAuth,
-    authorizationScopes: ["USERS"],
-  });
-
-  
 
   // Tạo auth resource
   const authResource = restAPI.root.addResource("auth");

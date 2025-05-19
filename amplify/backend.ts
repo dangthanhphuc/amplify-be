@@ -1,7 +1,6 @@
 import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
-import { aiAgentGetMethodFnc } from './functions/agents/resources';
 import { createRestApiStack } from './stacks/rest-api-stack';
 import { signUpPostMethodFnc } from './functions/auth/signup/resources';
 import { signInPostMethodFnc } from './functions/auth/signin/resources';
@@ -11,13 +10,11 @@ import { signInWithRedirectFacebookFnc } from './functions/auth/signInWithRedire
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { getTokenByCodeFnc } from './functions/auth/token/resources';
 import { getAgentsFnc } from './functions/agents/get/resources';
-import { CfnDBCluster } from 'aws-cdk-lib/aws-rds';
 
 // Define backend with Aurora RDS integration
 export const backend = defineBackend({
   auth,
   data,
-  aiAgentGetMethodFnc,
   signUpPostMethodFnc,
   signInPostMethodFnc,
   confirmSignUpPostMethodFnc,

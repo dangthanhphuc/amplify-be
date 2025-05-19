@@ -74,22 +74,21 @@ export function createRestApiStack(backend: any) {
     authorizationScopes: ["USERS"]
   };
 
-  const methodOptionsForExperts : MethodOptions = {
-    authorizationType: AuthorizationType.COGNITO,
-    authorizer: cognitoAuth,
-    authorizationScopes: ["EXPERTS"]
-  };
+  // const methodOptionsForExperts : MethodOptions = {
+  //   authorizationType: AuthorizationType.COGNITO,
+  //   authorizer: cognitoAuth,
+  //   authorizationScopes: ["EXPERTS"]
+  // };
 
-  const methodOptionsForAdmins : MethodOptions = {
-    authorizationType: AuthorizationType.COGNITO,
-    authorizer: cognitoAuth,
-    authorizationScopes: ["ADMINS"]
-  };
+  // const methodOptionsForAdmins : MethodOptions = {
+  //   authorizationType: AuthorizationType.COGNITO,
+  //   authorizer: cognitoAuth,
+  //   authorizationScopes: ["ADMINS"]
+  // };
 
 
   // Tạo auth resource
   const authResource = restAPI.root.addResource("auth");
-
 
   const signupResource = authResource.addResource("signup");
   signupResource.addMethod("POST", lambdaForSignUp);
@@ -104,7 +103,7 @@ export function createRestApiStack(backend: any) {
   signInWithRedirectGoogleResource.addMethod("GET", lambdaForSignInWithRedirectGoogle);
 
   const signInWithRedirectFacebookResource = authResource.addResource("signInWithRedirectFacebook");
-  signInWithRedirectFacebookResource.addMethod("GET", lambdaForSignInWithRedirectFacebook);
+  signInWithRedirectFacebookResource.addMethod("GET", lambdaForSignInWithRedirectFacebook, methodOptionsForUsers);
 
   const getTokenByCodeResource = authResource.addResource("getTokenByCode");
   getTokenByCodeResource.addMethod("GET", lambdaForGetTokenByCode);
@@ -112,7 +111,6 @@ export function createRestApiStack(backend: any) {
   // Tạo agents resource
   const agentsResource = restAPI.root.addResource("agents");
   agentsResource.addMethod("GET", lambdaForGetAgents);
-
 
   // Return the REST API and outputs for use in the main backend.ts file
   return {

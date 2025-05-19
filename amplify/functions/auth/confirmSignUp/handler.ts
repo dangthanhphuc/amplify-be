@@ -30,7 +30,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       GroupName: "USERS",
       UserPoolId: env.USER_POOL_ID,
       Username: email,
-
     }).promise();
 
     return {

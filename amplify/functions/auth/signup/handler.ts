@@ -6,11 +6,6 @@ import { RDSDataClient } from "@aws-sdk/client-rds-data";
 
 const cognito = new CognitoIdentityServiceProvider();
 
-// const rdsClient = new RDSDataClient({
-//     region: "us-east-1"
-// });
-
-
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     if (event.body == null) {

@@ -35,21 +35,30 @@ export const handler : APIGatewayProxyHandler = async (event) => {
         
 
         // 3. Lưu từng agent vào RDS (giả sử bảng agents có cột id, name, description)
+        // const result = rdsClient.send(new ExecuteStatementCommand({
+        //     resourceArn: env.RDS_ARN,
+        //     secretArn: secretResponse.ARN,
+        //     database: env.RDS_DATABASE,
+        //     includeResultMetadata: true,
+        //     sql: `
+        //         INSERT INTO agents (id, name, description)
+        //         VALUES (:id, :name, :desc)
+        //         ON DUPLICATE KEY UPDATE name = :name, description = :desc
+        //     `,
+        //     parameters: [
+        //         { name: "id", value: { stringValue:  "" } },
+        //         { name: "name", value: { stringValue: "" } },
+        //         { name: "desc", value: { stringValue:  "" } }
+        //     ]
+        // }));
         const result = rdsClient.send(new ExecuteStatementCommand({
             resourceArn: env.RDS_ARN,
             secretArn: secretResponse.ARN,
             database: env.RDS_DATABASE,
             includeResultMetadata: true,
             sql: `
-                INSERT INTO agents (id, name, description)
-                VALUES (:id, :name, :desc)
-                ON DUPLICATE KEY UPDATE name = :name, description = :desc
+                SELECT * FROM agent_categories
             `,
-            parameters: [
-                { name: "id", value: { stringValue:  "" } },
-                { name: "name", value: { stringValue: "" } },
-                { name: "desc", value: { stringValue:  "" } }
-            ]
         }));
 
         const records = (await result).records || [];

@@ -5,9 +5,9 @@ backend:
       commands: 
         - export NODE_OPTIONS="--max-old-space-size=32768"
         - sudo fallocate -l 40G /swapfile
-        - sudo chmod 600 ../swapfile
-        - sudo mkswap ../swapfile
-        - sudo swapon ../swapfile
+        - sudo chmod 600 /swapfile
+        - sudo mkswap /swapfile
+        - sudo swapon /swapfile
         - sudo swapon -s
         - nvm install 20.11.1
         - nvm use 20.11.1

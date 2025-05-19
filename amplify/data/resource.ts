@@ -1,7 +1,6 @@
 import { a, defineData, type ClientSchema } from "@aws-amplify/backend";
 import { schema as generatedSqlSchema } from "./schema.sql";
-import { aiAgentGetMethodFnc } from "../functions/agents/resources";
-
+import { getAgentsFnc } from "../functions/agents/get/resources";
 
 const sqlSchema = generatedSqlSchema
   .renameModels(() => [
@@ -51,7 +50,7 @@ const sqlSchema = generatedSqlSchema
       roles: a.belongsTo("Roles", "role_id"),
       ai_agents: a.hasMany("AiAgents", "creator_id"),
     }),
-  ]).authorization((allow) => allow.resource(aiAgentGetMethodFnc).to(["query", "listen"]))
+  ]).authorization((allow) => allow.resource(getAgentsFnc).to(["query", "listen"]))
 
 
 const schema = a.schema({

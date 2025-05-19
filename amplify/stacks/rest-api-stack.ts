@@ -68,6 +68,10 @@ export function createRestApiStack(backend: any) {
     backend.getAgentsFnc.resources.lambda
   )
 
+  const lambdaFordDataForAgents = createLambdaIntegrationResponse(
+    backend.initialDataForAiAgentFnc.resources.lambda
+  );
+
   const methodOptionsForUsers : MethodOptions = {
     authorizationType: AuthorizationType.COGNITO,
     authorizer: cognitoAuth,
@@ -111,6 +115,10 @@ export function createRestApiStack(backend: any) {
   // Tạo agents resource
   const agentsResource = restAPI.root.addResource("agents");
   agentsResource.addMethod("GET", lambdaForGetAgents);
+
+  // Add source for db
+  const dataForAgents = restAPI.root.addResource("dataForAgents");
+  agentsResource.addMethod("POST", lambdaFordDataForAgents);
 
   // Return the REST API and outputs for use in the main backend.ts file
   return {

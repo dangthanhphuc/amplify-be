@@ -10,6 +10,7 @@ import { signInWithRedirectFacebookFnc } from './functions/auth/signInWithRedire
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { getTokenByCodeFnc } from './functions/auth/token/resources';
 import { getAgentsFnc } from './functions/agents/get/resources';
+import { initialDataForAiAgentFnc } from './functions/agents/initial-data/resources';
 
 // Define backend with Aurora RDS integration
 export const backend = defineBackend({
@@ -21,7 +22,8 @@ export const backend = defineBackend({
   signInWithRedirectFacebookFnc,
   signInWithRedirectGoogleFnc,
   getTokenByCodeFnc,
-  getAgentsFnc
+  getAgentsFnc,
+  initialDataForAiAgentFnc
 });
 
 // Create REST API stack

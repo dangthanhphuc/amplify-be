@@ -3,8 +3,8 @@ import {
   BedrockAgentClient,
   AgentSummary
 } from "@aws-sdk/client-bedrock-agent";
-import { getAllBedrockAgents } from "../../../services/testservice";
-import { getBedrockClient } from "../../../utils/clients";
+import { getAllBedrockAgents } from "../../services/testservice";
+import { getBedrockClient } from "../../utils/clients";
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {

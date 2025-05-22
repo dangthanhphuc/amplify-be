@@ -1,28 +1,30 @@
 
 import type { APIGatewayProxyHandler } from "aws-lambda";
-import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { env } from "$amplify/env/signUpPostMethodFnc";
-import { RDSDataClient } from "@aws-sdk/client-rds-data";
+import { SignUpRequest } from "aws-sdk/clients/cognitoidentityserviceprovider";
+import { getCognitoClient } from "../../../utils/clients";
+import { addUserToGroupService } from "../../../services/cognitoService";
 
-const cognito = new CognitoIdentityServiceProvider();
 
 export const handler: APIGatewayProxyHandler = async (event) => {
-  try {
+  try { 
     if (event.body == null) {
         return {
             statusCode: 404,
-            body: JSON.stringify({
-                message: "No request body",
+            body: JSON.stringify({  
+                message: "No request body", 
             }),
         };
     }
 
+    const cognitoClient = getCognitoClient();
+
     const requestBody = JSON.parse(event.body);
     const { email, password, name } = requestBody;
 
-    const params = {
+    const params : SignUpRequest = {
         ClientId: env.USER_POOL_CLIENT_ID,
-        Username: email,
+        Username: email,  
         Password: password,
         UserAttributes: [
             {
@@ -32,15 +34,15 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         ]
     };
 
-    const result = await cognito.signUp(params).promise();
+    const result = await cognitoClient.signUp(params).promise();
+    console.log("User signed up successfully:", result);
+
+    // Add user to group
+    const resultAddUserToGroup = await addUserToGroupService(cognitoClient, "USERS", env.USER_POOL_CLIENT_ID, email);
+    console.log("User added to group successfully:", resultAddUserToGroup);
 
     return {
       statusCode: 200,
-      // headers: {
-      //   "Access-Control-Allow-Origin": "*",  // Hoặc "http://localhost:3000" để an toàn hơn
-      //   "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Amz-Date,X-Api-Key",
-      //   "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS"
-      // },
       body: JSON.stringify({
         result
       })
@@ -48,11 +50,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   } catch (error : any) {
     return {
       statusCode: 500,
-      // headers: {
-      //   "Access-Control-Allow-Origin": "*",  // Hoặc "http://localhost:3000" để an toàn hơn
-      //   "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Amz-Date,X-Api-Key",
-      //   "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS"
-      // },
       body: JSON.stringify({
         message: "Error signing up",
         error: error.message,

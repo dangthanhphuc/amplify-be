@@ -11,6 +11,7 @@ import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { getTokenByCodeFnc } from './functions/auth/token/resources';
 import { getAgentsFnc } from './functions/agents/get/resources';
 import { initialDataForAiAgentFnc } from './functions/agents/initial-data/resources';
+import { testFnc } from './functions/tests/resources';
 
 // Define backend with Aurora RDS integration
 export const backend = defineBackend({
@@ -23,7 +24,8 @@ export const backend = defineBackend({
   signInWithRedirectGoogleFnc,
   getTokenByCodeFnc,
   getAgentsFnc,
-  initialDataForAiAgentFnc
+  initialDataForAiAgentFnc,
+  testFnc
 });
 
 // Create REST API stack
@@ -60,11 +62,15 @@ cfnUserPool.policies = {
   },
 };
 
-backend.getAgentsFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+backend.initialDataForAiAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
   actions: [
     'bedrock:ListAgents',
-    'bedrock:GetAgent'
+    'bedrock:GetAgent',
+    'bedrock:ListAgentCategories',
+    'bedrock:ListAgentAliases',
+    'secretsmanager:GetSecretValue',
+    'rds-data:BatchExecuteStatement'
   ],
   resources: ["*"]
 }));
@@ -77,7 +83,17 @@ backend.getAgentsFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
     'rds-data:BeginTransaction',
     'rds-data:CommitTransaction',
     'rds-data:RollbackTransaction',
+    'bedrock:ListAgents',
+    'bedrock:GetAgent',
     'secretsmanager:GetSecretValue'
+  ],
+  resources: ["*"]
+}));
+
+backend.testFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    "*"
   ],
   resources: ["*"]
 }));

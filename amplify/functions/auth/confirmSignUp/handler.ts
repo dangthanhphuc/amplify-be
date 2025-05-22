@@ -1,8 +1,8 @@
 import type { APIGatewayProxyHandler } from "aws-lambda";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { env } from "$amplify/env/confirmSignUpPostMethodFnc";
+import { getCognitoClient } from "../../../utils/clients";
 
-const cognito = new CognitoIdentityServiceProvider();
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
@@ -15,18 +15,20 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       };
     }
 
+    const cognitoClient = getCognitoClient();
+
     const requestBody = JSON.parse(event.body);
     const { email, confirmationCode } = requestBody;
 
     // Confirm signup for the user
-    const result = await cognito.confirmSignUp({
+    const result = await cognitoClient.confirmSignUp({
         ClientId: env.USER_POOL_CLIENT_ID,
         Username: email,
         ConfirmationCode: confirmationCode
       }).promise();
 
     // Add user to the USERS group
-    await cognito.adminAddUserToGroup({
+    await cognitoClient.adminAddUserToGroup({
       GroupName: "USERS",
       UserPoolId: env.USER_POOL_ID,
       Username: email,

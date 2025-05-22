@@ -1,8 +1,10 @@
 import type { APIGatewayProxyHandler } from "aws-lambda";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { env } from "$amplify/env/signInPostMethodFnc";
+import { getCognitoClient } from "../../../utils/clients";
+import { sign } from "crypto";
+import { signoutService } from "../../../services/cognitoService";
 
-const cognito = new CognitoIdentityServiceProvider();
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
@@ -15,6 +17,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       };
     }
 
+    const cognitoClient = getCognitoClient();
+
     const requestBody = JSON.parse(event.body);
     const { email, password } = requestBody;
 
@@ -26,7 +30,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         PASSWORD: password,
       },
     };
-    const result = await cognito.initiateAuth(params).promise();
+    const result = await cognitoClient.initiateAuth(params).promise();
+    result.AuthenticationResult
     return {
       statusCode: 200,
       body: JSON.stringify({

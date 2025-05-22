@@ -8,7 +8,39 @@ export const schema = configure({
     database: {
         identifier: "IDXRmlBfQHJsV6kbPSod9g",
         engine: "mysql",
-        connectionUri: secret("SQL_CONNECTION_STRING")
+        connectionUri: secret("SQL_CONNECTION_STRING"),
+        vpcConfig: {
+            vpcId: "vpc-023b988ef1945c386",
+            securityGroupIds: [
+                "sg-06c1e5b6d732d6c74"
+            ],
+            subnetAvailabilityZones: [
+                {
+                    subnetId: "subnet-0d9f35c8791bcc577",
+                    availabilityZone: "us-east-1d"
+                },
+                {
+                    subnetId: "subnet-0142bd2eb9f280b40",
+                    availabilityZone: "us-east-1f"
+                },
+                {
+                    subnetId: "subnet-0f0959d95649e4cd8",
+                    availabilityZone: "us-east-1e"
+                },
+                {
+                    subnetId: "subnet-080fa077c97660073",
+                    availabilityZone: "us-east-1c"
+                },
+                {
+                    subnetId: "subnet-0cb0bb204dfc79fa0",
+                    availabilityZone: "us-east-1a"
+                },
+                {
+                    subnetId: "subnet-0cb3d3fa13cf7b033",
+                    availabilityZone: "us-east-1b"
+                }
+            ]
+        }
     }
 }).schema({
     "agent_categories": a.model({
@@ -18,32 +50,40 @@ export const schema = configure({
         "id"
     ]),
     "ai_agents": a.model({
-        id: a.integer().required(),
+        id: a.string().required(),
         name: a.string(),
-        cost: a.string(),
+        icon: a.string(),
         introduction: a.string(),
         description: a.string(),
         foreword: a.string(),
-        version: a.string(),
-        is_public: a.integer(),
+        last_version: a.string(),
+        status: a.string(),
         like_count: a.integer(),
         total_interactions: a.integer(),
         creator_id: a.integer(),
-        agent_category_id: a.integer(),
-        knowledge_base_id: a.string(),
+        knowledge_base_url: a.string(),
         sys_prompt: a.string(),
         create_at: a.datetime(),
         model: a.string(),
-        capabilities: a.string()
+        capabilities: a.json(),
+        alias_ids: a.json(),
+        cost: a.float()
     }).identifier([
         "id"
+    ]),
+    "ai_categories": a.model({
+        ai_agent_id: a.string().required(),
+        agent_category_id: a.integer().required()
+    }).identifier([
+        "ai_agent_id",
+        "agent_category_id"
     ]),
     "ai_reviews": a.model({
         id: a.integer().required(),
         description: a.string(),
         rating: a.integer(),
         create_at: a.datetime(),
-        ai_agent_id: a.integer(),
+        ai_agent_id: a.string(),
         reporter_id: a.integer(),
         report_categories_id: a.integer()
     }).identifier([
@@ -54,7 +94,7 @@ export const schema = configure({
         raw_content: a.string(),
         create_at: a.datetime(),
         user_id: a.integer(),
-        ai_agent_id: a.integer()
+        ai_agent_id: a.string()
     }).identifier([
         "id"
     ]),
@@ -73,7 +113,7 @@ export const schema = configure({
     ]),
     "user_likes": a.model({
         user_id: a.integer().required(),
-        ai_agent_id: a.integer().required(),
+        ai_agent_id: a.string().required(),
         liked: a.integer(),
         create_at: a.datetime()
     }).identifier([

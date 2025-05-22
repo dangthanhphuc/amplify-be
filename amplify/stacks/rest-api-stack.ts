@@ -118,7 +118,11 @@ export function createRestApiStack(backend: any) {
 
   // Add source for db
   const dataForAgents = restAPI.root.addResource("dataForAgents");
-  dataForAgents.addMethod("POST", lambdaFordDataForAgents);
+  dataForAgents.addMethod("GET", lambdaFordDataForAgents)
+  // Test resource
+  const testResource = restAPI.root.addResource("test");
+  const testFnc = new LambdaIntegration(backend.testFnc.resources.lambda);
+  testResource.addMethod("GET", testFnc);
 
   // Return the REST API and outputs for use in the main backend.ts file
   return {

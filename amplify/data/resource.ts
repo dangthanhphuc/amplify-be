@@ -5,6 +5,7 @@ import { getAgentsFnc } from "../functions/agents/get/resources";
 const sqlSchema = generatedSqlSchema
   .renameModels(() => [
     ["agent_categories", "AgentCategories"],
+    ["ai_categories", "AiCategories"],
     ["ai_agents", "AiAgents"],
     ["ai_reviews", "AiReviews"],
     ["chats", "Chats"],
@@ -15,7 +16,11 @@ const sqlSchema = generatedSqlSchema
   ])
   .setRelationships((models) => [
     models.AgentCategories.relationships({
-      ai_agents: a.hasMany("AiAgents", "agent_category_id"),
+      ai_categories: a.hasMany("AiCategories", "agent_category_id"),
+    }),
+    models.AiCategories.relationships({
+      ai_agents: a.belongsTo("AiAgents", "ai_agent_id"),
+      agent_categories: a.belongsTo("AgentCategories", "agent_category_id"),
     }),
     models.AiReviews.relationships({
       ai_agents: a.belongsTo("AiAgents", "ai_agent_id"),
@@ -23,7 +28,7 @@ const sqlSchema = generatedSqlSchema
       report_categories: a.belongsTo("ReportCategories", "report_categories_id"),
     }),
     models.AiAgents.relationships({
-      agent_categories: a.belongsTo("AgentCategories", "agent_category_id"),
+      ai_categories: a.hasMany("AiCategories", "ai_agent_id"),
       chats: a.hasMany("Chats", "ai_agent_id"),
       user_likes: a.hasMany("UserLikes", "ai_agent_id"),
       ai_reviews: a.hasMany("AiReviews", "ai_agent_id"),
@@ -52,7 +57,6 @@ const sqlSchema = generatedSqlSchema
     }),
   ]);
 
-
 const schema = a.schema({
   Todo: a.model({
     content: a.string(),
@@ -63,7 +67,6 @@ const combinedSchema = a.combine([schema, sqlSchema]);
 
 // Update client types
 export type Schema = ClientSchema<typeof sqlSchema>;
-
 
 export const data = defineData({
   schema: sqlSchema,

@@ -24,6 +24,7 @@
         "@aws-sdk/client-rds-data": "^3.806.0",
         "@dotenvx/dotenvx": "^1.44.0",
         "amplify-be": "file:",
-        "aws-amplify": "^6.14.4"
+        "aws-amplify": "^6.14.4",
+        "bcryptjs": "^3.0.2"
     }
 }

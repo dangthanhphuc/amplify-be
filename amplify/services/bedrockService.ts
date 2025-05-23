@@ -144,7 +144,7 @@ export async function initialDataForAiAgent(
         name: "totalInteractions",
         value: { longValue: agent.totalInteractions },
       },
-      { name: "creatorId", value: { longValue: agent.creatorId || 1 } },
+      { name: "creatorId", value: { stringValue: String(agent.creatorId || 1) } },
       {
         name: "introduction",
         value: { stringValue: agent.introduction || "" },

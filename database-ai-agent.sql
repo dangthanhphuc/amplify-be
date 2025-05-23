@@ -21,7 +21,9 @@ CREATE TABLE report_categories (
 
 -- 2. Bảng users (phụ thuộc roles)
 CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id VARCHAR(255) PRIMARY KEY,
+    email VARCHAR(255),
+    password VARCHAR(255),
     name VARCHAR(100),
     display_name VARCHAR(100),
     profile_image VARCHAR(255),
@@ -42,7 +44,7 @@ CREATE TABLE ai_agents (
     status VARCHAR(50),
     like_count INT DEFAULT 0,
     total_interactions INT DEFAULT 0,
-    creator_id INT,
+    creator_id VARCHAR(255),
     knowledge_base_url VARCHAR(255),
     sys_prompt TEXT,
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -64,7 +66,7 @@ CREATE TABLE ai_categories (
 
 -- 5. Các bảng phụ thuộc khác
 CREATE TABLE user_likes (
-    user_id INT,
+    user_id VARCHAR(255),
     ai_agent_id VARCHAR(255),
     liked BOOLEAN,
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -79,7 +81,7 @@ CREATE TABLE ai_reviews (
     rating INT,
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ai_agent_id VARCHAR(255),
-    reporter_id INT,
+    reporter_id VARCHAR(255),
     report_categories_id INT,
     FOREIGN KEY (ai_agent_id) REFERENCES ai_agents(id),
     FOREIGN KEY (reporter_id) REFERENCES users(id),
@@ -90,7 +92,7 @@ CREATE TABLE chats (
     id INT PRIMARY KEY AUTO_INCREMENT,
     raw_content NVARCHAR(255),
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    user_id INT,
+    user_id VARCHAR(255),
     ai_agent_id VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (ai_agent_id) REFERENCES ai_agents(id)

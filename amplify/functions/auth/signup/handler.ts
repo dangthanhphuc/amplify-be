@@ -2,8 +2,10 @@
 import type { APIGatewayProxyHandler } from "aws-lambda";
 import { env } from "$amplify/env/signUpPostMethodFnc";
 import { SignUpRequest } from "aws-sdk/clients/cognitoidentityserviceprovider";
-import { getCognitoClient } from "../../../utils/clients";
+import { getCognitoClient, getRdsClient } from "../../../utils/clients";
 import { addUserToGroupService } from "../../../services/cognitoService";
+import { saveUserToRds } from "../../../services/rdsService";
+import { User } from "../../../interfaces/user";
 
 
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -34,17 +36,32 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         ]
     };
 
-    const result = await cognitoClient.signUp(params).promise();
-    console.log("User signed up successfully:", result);
+    // 1. Signup user
+    const resultSignUp = await cognitoClient.signUp(params).promise();
+    console.log("User signed up successfully:", resultSignUp);
 
-    // Add user to group
+    // 2. Add user to group
     const resultAddUserToGroup = await addUserToGroupService(cognitoClient, "USERS", env.USER_POOL_ID, email);
     console.log("User added to group successfully:", resultAddUserToGroup);
+
+    // 3. Save user to RDS
+    const rdsClient = getRdsClient();
+    const user : User = {
+      id: resultSignUp.UserSub,
+      email: email,
+      password: password,
+      name: name,
+      displayName: "",
+      profileImage: "",
+      description: "",
+      roleId: 1
+    };
+    saveUserToRds(rdsClient, env.RDS_ARN, env.RDS_DATABASE, user);
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        result
+        resultSignUp
       })
     };
   } catch (error : any) {

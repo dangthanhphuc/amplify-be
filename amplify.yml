@@ -13,6 +13,7 @@ backend:
         - nvm use 20.11.1
         - npm install --package-lock-only
         - echo "USER_POOL_CLIENT_ID=$USER_POOL_CLIENT_ID" >> .env
+        - echo "USER_POOL_ID=$USER_POOL_ID" >> .env
         - echo "COGNITO_DOMAIN=$COGNITO_DOMAIN" >> .env
         - echo "API_GATEWAY=$API_GATEWAY" >> .env
         - npm ci --cache .npm --prefer-offline

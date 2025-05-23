@@ -38,7 +38,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     console.log("User signed up successfully:", result);
 
     // Add user to group
-    const resultAddUserToGroup = await addUserToGroupService(cognitoClient, "USERS", env.USER_POOL_CLIENT_ID, email);
+    const resultAddUserToGroup = await addUserToGroupService(cognitoClient, "USERS", env.USER_POOL_ID, email);
     console.log("User added to group successfully:", resultAddUserToGroup);
 
     return {

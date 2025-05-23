@@ -90,6 +90,17 @@ backend.getAgentsFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   resources: ["*"]
 }));
 
+backend.signUpPostMethodFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    'cognito-idp:AdminCreateUser',
+    'cognito-idp:AdminSetUserPassword',
+    'cognito-idp:AdminAddUserToGroup',
+    'cognito-idp:AdminUpdateUserAttributes'
+  ],
+  resources: ["*"]
+}));
+
 backend.testFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
   actions: [

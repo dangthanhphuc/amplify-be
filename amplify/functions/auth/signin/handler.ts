@@ -31,6 +31,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       },
     };
     const result = await cognitoClient.initiateAuth(params).promise();
+
     result.AuthenticationResult
     return {
       statusCode: 200,

@@ -100,7 +100,7 @@ export function createRestApiStack(backend: any) {
   //   authorizationType: AuthorizationType.COGNITO,
   //   authorizer: cognitoAuth,
   //   authorizationScopes: ["ADMINS"]
-  // };
+  // };]
 
 
   // Tạo auth resource
@@ -127,7 +127,8 @@ export function createRestApiStack(backend: any) {
   // Tạo agents resource
   const agentsResource = restAPI.root.addResource("agents");
   agentsResource.addMethod("GET", lambdaForGetAgents);
-  agentsResource.addMethod("POST", lambdaForChatWithAgent);
+  const agentChatResource = agentsResource.addResource("chat");
+  agentChatResource.addMethod("POST", lambdaForChatWithAgent);
 
   // User resource
   const userResource = restAPI.root.addResource("users");

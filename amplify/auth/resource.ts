@@ -1,4 +1,5 @@
 import { defineAuth, secret } from '@aws-amplify/backend';
+import { postConfirmationFnc } from '../functions/auth/postConfirmation/handler';
 
 export const auth = defineAuth({
   loginWith: {
@@ -56,6 +57,8 @@ export const auth = defineAuth({
     }
   },
   accountRecovery: 'EMAIL_ONLY',
-  groups: ["USERS", "EXPERTS", "ADMINS"]
-  // access: 
+  groups: ["USERS", "EXPERTS", "ADMINS"],
+  triggers: { 
+    postConfirmation: postConfirmationFnc
+  }
 });

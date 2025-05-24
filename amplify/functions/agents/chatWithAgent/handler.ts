@@ -40,7 +40,7 @@ export const handler : APIGatewayProxyHandler = async (event) => {
             statusCode: 200,
             body: JSON.stringify({
                 message: "Success",
-                body: JSON.stringify(response)
+                body: response
             }),
         }
     } catch (error: any) {
@@ -49,7 +49,7 @@ export const handler : APIGatewayProxyHandler = async (event) => {
             statusCode: 200,
             body: JSON.stringify({
                 message: "Error",
-                body: JSON.stringify(error)
+                body: error
             }),
         }
     }

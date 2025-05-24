@@ -16,6 +16,7 @@ import { chatWithAgentFnc } from './functions/agents/chatWithAgent/resources';
 import { storageForProject } from './storage/resource';
 import { getUserInfoFnc } from './functions/users/getUserInfo/resource';
 import { updateUserFnc } from './functions/users/updateUser/resource';
+import { postConfirmationFnc } from './functions/auth/postConfirmation/handler';
 
 // Define backend with Aurora RDS integration
 export const backend = defineBackend({
@@ -33,6 +34,7 @@ export const backend = defineBackend({
   chatWithAgentFnc,
   getUserInfoFnc,
   updateUserFnc,
+  // postConfirmationFnc,
   testFnc
 });
 
@@ -113,6 +115,7 @@ backend.getAgentsFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
     'rds-data:CommitTransaction',
     'rds-data:RollbackTransaction',
     'bedrock:ListAgents',
+    'bedrock:ListAgentAliases',
     'bedrock:GetAgent',
     'secretsmanager:GetSecretValue'
   ],

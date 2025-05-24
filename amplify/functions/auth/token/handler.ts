@@ -12,7 +12,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     // Tạo URL redirect đến Google OAuth
       const domain = env.COGNITO_DOMAIN;
-      // const clientId = "4jn8ensor1j1017kkc2i029mss";
+      // const clientId = secret("USER_POOL_CLIENT_ID");
       // const redirectUri = encodeURIComponent(env.CALLBACK_URL || '');
 
     if(!code) {

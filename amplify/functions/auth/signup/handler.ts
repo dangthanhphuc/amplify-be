@@ -2,10 +2,12 @@
 import type { APIGatewayProxyHandler } from "aws-lambda";
 import { env } from "$amplify/env/signUpPostMethodFnc";
 import { SignUpRequest } from "aws-sdk/clients/cognitoidentityserviceprovider";
-import { getCognitoClient, getRdsClient } from "../../../utils/clients";
+import { getCognitoClient, getRdsClient, getSecretManagerClient } from "../../../utils/clients";
 import { addUserToGroupService } from "../../../services/cognitoService";
 import { saveUserToRds } from "../../../services/rdsService";
 import { User } from "../../../interfaces/user";
+import { secret } from '@aws-amplify/backend';
+import { getSecret } from "../../../services/secretManagerService";
 
 
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -56,7 +58,17 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       description: "",
       roleId: 1
     };
-    saveUserToRds(rdsClient, env.RDS_ARN, env.RDS_DATABASE, user);
+    const secretManagerClient = getSecretManagerClient();
+    const secretValue = await getSecret(
+      secretManagerClient,
+      "prod/RDS_SECRET_ARN"
+    );
+    
+    console.log("Secret value:", secretValue);
+    if(secretValue.ARN)
+      await saveUserToRds(rdsClient, env.RDS_ARN, secretValue.ARN, user);
+    else 
+      console.log("Secret value is null or undefined");
 
     return {
       statusCode: 200,

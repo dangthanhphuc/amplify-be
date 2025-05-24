@@ -3,8 +3,8 @@ import {
   BedrockAgentClient,
   AgentSummary
 } from "@aws-sdk/client-bedrock-agent";
-import { getAllBedrockAgents } from "../../../services/testservice";
 import { getBedrockClient } from "../../../utils/clients";
+import { getAllBedrockAgents } from "../../../services/bedrockService";
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
@@ -23,7 +23,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     else {
       const listAgentsSummary: AgentSummary[] = [];
 
-      const bedrockResponse = await getAllBedrockAgents(bedrockClient, Number(maxResults), undefined)
+      const bedrockResponse = await getAllBedrockAgents(Number(maxResults), undefined, bedrockClient)
 
       listAgentsSummary.push(...(bedrockResponse || []));
 

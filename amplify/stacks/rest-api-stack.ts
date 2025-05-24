@@ -72,6 +72,18 @@ export function createRestApiStack(backend: any) {
     backend.initialDataForAiAgentFnc.resources.lambda
   );
 
+  const lambdaForChatWithAgent = createLambdaIntegrationResponse(
+    backend.chatWithAgentFnc.resources.lambda
+  );
+
+  const lambdaForGetUserInfo = createLambdaIntegrationResponse(
+    backend.getUserInfoFnc.resources.lambda
+  );
+
+  const lambdaForUpdateUser = createLambdaIntegrationResponse(
+    backend.updateUserFnc.resources.lambda
+  );
+
   const methodOptionsForUsers : MethodOptions = {
     authorizationType: AuthorizationType.COGNITO,
     authorizer: cognitoAuth,
@@ -115,6 +127,13 @@ export function createRestApiStack(backend: any) {
   // Tạo agents resource
   const agentsResource = restAPI.root.addResource("agents");
   agentsResource.addMethod("GET", lambdaForGetAgents);
+  agentsResource.addMethod("POST", lambdaForChatWithAgent);
+
+  // User resource
+  const userResource = restAPI.root.addResource("users");
+  userResource.addMethod("GET", lambdaForGetUserInfo);
+  userResource.addMethod("PUT", lambdaForUpdateUser, methodOptionsForUsers);
+
 
   // Add source for db
   const dataForAgents = restAPI.root.addResource("dataForAgents");

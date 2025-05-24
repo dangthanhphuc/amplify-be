@@ -2,9 +2,11 @@ import { BedrockAgentClient } from "@aws-sdk/client-bedrock-agent";
 import { RDSDataClient } from "@aws-sdk/client-rds-data";
 import { SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
+import { BedrockAgentRuntimeClient, InvokeAgentCommand } from '@aws-sdk/client-bedrock-agent-runtime';
 
 
 let bedrockClient: BedrockAgentClient | null = null;
+let bedrockAgentRuntimeClient: BedrockAgentRuntimeClient | null = null;
 let rdsClient: RDSDataClient | null = null;
 let secretManagerClient: SecretsManagerClient | null = null;
 let cognitoClient : CognitoIdentityServiceProvider | null = null;
@@ -14,6 +16,13 @@ export function getBedrockClient() {
     bedrockClient = new BedrockAgentClient({ region: "us-east-1" });
   }
   return bedrockClient;
+}
+
+export function getBedrockAgentRuntimeClient() {
+  if (!bedrockAgentRuntimeClient) {
+    bedrockAgentRuntimeClient = new BedrockAgentRuntimeClient({ region: "us-east-1" });
+  }
+  return bedrockAgentRuntimeClient;
 }
 
 export function getRdsClient() {

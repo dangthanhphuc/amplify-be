@@ -15,6 +15,48 @@ import {
   GetSecretValueCommand,
   SecretsManagerClient,
 } from "@aws-sdk/client-secrets-manager";
+import {
+  BedrockAgentRuntimeClient,
+  InvokeAgentCommand,
+} from "@aws-sdk/client-bedrock-agent-runtime";
+
+export async function invokeAgentCommand(
+  bedrockAgentRuntimeClient: BedrockAgentRuntimeClient,
+  command: InvokeAgentCommand,
+  sessionId : string
+) {
+
+  const response = await bedrockAgentRuntimeClient.send(command);
+
+  let completion = "";
+  const traces: Record<string, string> = {};
+
+  if (response.completion) {
+    for await (const event of response.completion) {
+      const chunk = event.chunk || {};
+
+      if (chunk.bytes) {
+        completion += new TextDecoder().decode(chunk.bytes);
+      }
+
+      const t = event.trace || {};
+      if (t.trace) {
+        traces[t.agentId || ""] = t.agentAliasId || "";
+      }
+    }
+  }
+
+  console.log("Completion: ", completion);
+  console.log("Traces:", traces);
+
+  // Trả về kết quả
+  return {
+    response: completion,
+    sessionId: sessionId,
+    trace:traces
+  };
+  
+}
 
 export async function getAllAgentsAndConvertAiAgent(
   bedrockClient: BedrockAgentClient
@@ -89,8 +131,8 @@ export async function getAllAgentsAndConvertAiAgent(
           return aiAgent;
         }
       );
-        const newAgents = await Promise.all(agentPromises);
-        aiAgents.push(...newAgents);
+      const newAgents = await Promise.all(agentPromises);
+      aiAgents.push(...newAgents);
     }
 
     nextToken = bedrockResponse.nextToken;
@@ -115,6 +157,9 @@ export async function getAllBedrockAgents(
     listAgentsSummary.push(...(bedrockResponse.agentSummaries || []));
     nextToken = bedrockResponse.nextToken;
   } while (nextToken != null);
+
+  // Note: Chưa xử lý chuyển về model
+
   return listAgentsSummary;
 }
 
@@ -126,7 +171,8 @@ export async function initialDataForAiAgent(
   bedrockClient: BedrockAgentClient
 ) {
   try {
-    const aiAgents: AiAgent[] = await getAllAgentsAndConvertAiAgent(bedrockClient);
+    const aiAgents: AiAgent[] =
+      await getAllAgentsAndConvertAiAgent(bedrockClient);
     console.log("AI Agents:", aiAgents);
 
     const parameterSets = aiAgents.map((agent) => [
@@ -144,7 +190,10 @@ export async function initialDataForAiAgent(
         name: "totalInteractions",
         value: { longValue: agent.totalInteractions },
       },
-      { name: "creatorId", value: { stringValue: String(agent.creatorId || 1) } },
+      {
+        name: "creatorId",
+        value: { stringValue: String(agent.creatorId || 1) },
+      },
       {
         name: "introduction",
         value: { stringValue: agent.introduction || "" },
@@ -154,7 +203,9 @@ export async function initialDataForAiAgent(
       { name: "sysPrompt", value: { stringValue: agent.sysPrompt || "" } },
       {
         name: "createAt",
-        value: { stringValue: agent.createAt.toISOString().replace(/\.\d{3}Z$/, '') },
+        value: {
+          stringValue: agent.createAt.toISOString().replace(/\.\d{3}Z$/, ""),
+        },
       },
       { name: "model", value: { stringValue: agent.model || "" } },
       {

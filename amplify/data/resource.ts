@@ -57,13 +57,13 @@ const sqlSchema = generatedSqlSchema
     }),
   ]);
 
-const schema = a.schema({
-  Todo: a.model({
-    content: a.string(),
-  }).authorization((allow) => allow.guest())
-});
+// const schema = a.schema({
+//   Todo: a.model({
+//     content: a.string(),
+//   }).authorization((allow) => allow.guest())
+// });
 
-const combinedSchema = a.combine([schema, sqlSchema]);
+// const combinedSchema = a.combine([schema, sqlSchema]);
 
 // Update client types
 export type Schema = ClientSchema<typeof sqlSchema>;
@@ -71,6 +71,6 @@ export type Schema = ClientSchema<typeof sqlSchema>;
 export const data = defineData({
   schema: sqlSchema,
   // authorizationModes:{
-  //   defaultAuthorizationMode: "lambda"
+  //   defaultAuthorizationMode: "userPool"
   // }
 });

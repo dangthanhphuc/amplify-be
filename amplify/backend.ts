@@ -12,11 +12,16 @@ import { getTokenByCodeFnc } from './functions/auth/token/resources';
 import { getAgentsFnc } from './functions/agents/get/resources';
 import { initialDataForAiAgentFnc } from './functions/agents/initial-data/resources';
 import { testFnc } from './functions/tests/resources';
+import { chatWithAgentFnc } from './functions/agents/chatWithAgent/resources';
+import { storageForProject } from './storage/resource';
+import { getUserInfoFnc } from './functions/users/getUserInfo/resource';
+import { updateUserFnc } from './functions/users/updateUser/resource';
 
 // Define backend with Aurora RDS integration
 export const backend = defineBackend({
   auth,
   data,
+  storageForProject,
   signUpPostMethodFnc,
   signInPostMethodFnc,
   confirmSignUpPostMethodFnc,
@@ -25,21 +30,19 @@ export const backend = defineBackend({
   getTokenByCodeFnc,
   getAgentsFnc,
   initialDataForAiAgentFnc,
+  chatWithAgentFnc,
+  getUserInfoFnc,
+  updateUserFnc,
   testFnc
 });
 
 // Create REST API stack
 const { outputs: restApiOutputs } = createRestApiStack(backend);
 
-// // Create Aurora MySQL stack
-// const { outputs: auroraOutputs } = createAuroraMySQLStack(backend);
-
-// Configure RDS clusterIdentifier
-
 // Configure OAuth settings for the User Pool Client
 const { cfnResources } = backend.auth.resources;
 if (cfnResources.cfnUserPoolClient) {
-  cfnResources.cfnUserPoolClient.allowedOAuthFlows = ['code']; // Options: 'code', 'implicit', or both
+  cfnResources.cfnUserPoolClient.allowedOAuthFlows = ['code']; 
   cfnResources.cfnUserPoolClient.allowedOAuthFlowsUserPoolClient = true;
   cfnResources.cfnUserPoolClient.allowedOAuthScopes = ['email', 'openid', 'profile'];
 
@@ -75,6 +78,32 @@ backend.initialDataForAiAgentFnc.resources.lambda.addToRolePolicy(new PolicyStat
   resources: ["*"]
 }));
 
+backend.getUserInfoFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    'rds-data:ExecuteStatement',
+    'rds-data:BatchExecuteStatement',
+    'rds-data:BeginTransaction',
+    'rds-data:CommitTransaction',
+    'rds-data:RollbackTransaction',
+    'secretsmanager:GetSecretValue'
+  ],
+  resources: ["*"]
+}));
+
+backend.updateUserFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    'rds-data:ExecuteStatement',
+    'rds-data:BatchExecuteStatement',
+    'rds-data:BeginTransaction',
+    'rds-data:CommitTransaction',
+    'rds-data:RollbackTransaction',
+    'secretsmanager:GetSecretValue'
+  ],
+  resources: ["*"]
+}));
+
 backend.getAgentsFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
   actions: [
@@ -96,7 +125,28 @@ backend.signUpPostMethodFnc.resources.lambda.addToRolePolicy(new PolicyStatement
     'cognito-idp:AdminCreateUser',
     'cognito-idp:AdminSetUserPassword',
     'cognito-idp:AdminAddUserToGroup',
-    'cognito-idp:AdminUpdateUserAttributes'
+    'cognito-idp:AdminUpdateUserAttributes',
+    'rds-data:ExecuteStatement',
+    'rds-data:BatchExecuteStatement',
+    'rds-data:BeginTransaction',
+    'rds-data:CommitTransaction',
+    'rds-data:RollbackTransaction',
+    'secretsmanager:GetSecretValue'
+  ],
+  resources: ["*"]
+}));
+
+backend.chatWithAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    'bedrock:ListAgents',
+    'bedrock:GetAgent',
+    'bedrock:InvokeAgent',
+    'bedrock:ListAgentCategories',
+    'bedrock:ListAgentAliases',
+    'bedrock:InvokeModel',
+    'secretsmanager:GetSecretValue',
+    'rds-data:BatchExecuteStatement'
   ],
   resources: ["*"]
 }));

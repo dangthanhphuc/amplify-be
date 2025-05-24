@@ -34,7 +34,7 @@ export const backend = defineBackend({
   chatWithAgentFnc,
   getUserInfoFnc,
   updateUserFnc,
-  // postConfirmationFnc,
+  postConfirmationFnc,
   testFnc
 });
 

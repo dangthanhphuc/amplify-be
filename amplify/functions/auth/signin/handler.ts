@@ -4,6 +4,7 @@ import { env } from "$amplify/env/signInPostMethodFnc";
 import { getCognitoClient } from "../../../utils/clients";
 import { sign } from "crypto";
 import { signoutService } from "../../../services/cognitoService";
+import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 
 
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -30,7 +31,13 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         PASSWORD: password,
       },
     };
-    const result = await cognitoClient.initiateAuth(params).promise();
+    const result = await cognitoClient.send(new InitiateAuthCommand({
+      AuthFlow: "USER_PASSWORD_AUTH",
+      ClientId: env.USER_POOL_CLIENT_ID,
+      AuthParameters: {
+        USERNAME: email,
+        PASSWORD: password,
+      }}));
 
     result.AuthenticationResult
     return {

@@ -67,6 +67,21 @@ cfnUserPool.policies = {
   },
 };
 
+backend.postConfirmationFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    'rds-data:ExecuteStatement',
+    'rds-data:BatchExecuteStatement',
+    'rds-data:BeginTransaction',
+    'rds-data:CommitTransaction',
+    'rds-data:RollbackTransaction',
+    'secretsmanager:GetSecretValue',
+    'ssm:GetParameters',
+    'ssm:GetParameter',
+  ],
+  resources: ["*"]
+}))
+
 backend.initialDataForAiAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
   actions: [

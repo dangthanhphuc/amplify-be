@@ -1,15 +1,15 @@
 import { BedrockAgentClient } from "@aws-sdk/client-bedrock-agent";
 import { RDSDataClient } from "@aws-sdk/client-rds-data";
 import { SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
-import { CognitoIdentityServiceProvider } from "aws-sdk";
-import { BedrockAgentRuntimeClient, InvokeAgentCommand } from '@aws-sdk/client-bedrock-agent-runtime';
+import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
+import { BedrockAgentRuntimeClient } from '@aws-sdk/client-bedrock-agent-runtime';
 
 
 let bedrockClient: BedrockAgentClient | null = null;
 let bedrockAgentRuntimeClient: BedrockAgentRuntimeClient | null = null;
 let rdsClient: RDSDataClient | null = null;
 let secretManagerClient: SecretsManagerClient | null = null;
-let cognitoClient : CognitoIdentityServiceProvider | null = null;
+let cognitoClient : CognitoIdentityProviderClient | null = null;
 
 export function getBedrockClient() {
   if (!bedrockClient) {
@@ -41,7 +41,7 @@ export function getSecretManagerClient() {
 
 export function getCognitoClient() {
     if (!cognitoClient) {
-        cognitoClient = new CognitoIdentityServiceProvider({ region: "us-east-1" });
+        cognitoClient = new CognitoIdentityProviderClient({ region: "us-east-1" });
     }
     return cognitoClient;
 }

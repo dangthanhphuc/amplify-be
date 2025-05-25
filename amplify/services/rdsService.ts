@@ -1,10 +1,8 @@
 import {  ExecuteStatementCommand, RDSDataClient } from "@aws-sdk/client-rds-data";
 import { User } from "../interfaces/user";
 import bcrypt from "bcryptjs";
-import { secret } from '@aws-amplify/backend';
 import { getSecret } from "./secretManagerService";
 import { getSecretManagerClient } from "../utils/clients";
-import { ResponseObject } from "../utils/responseObject";
 
 export async function getUserInfo(rdsClient : RDSDataClient, userId: string, resourceArn: string, secretName: string) { 
     try {

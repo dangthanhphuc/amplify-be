@@ -1,10 +1,10 @@
-import { CognitoIdentityServiceProvider } from "aws-sdk";
+import { AdminAddUserToGroupCommand, CognitoIdentityProviderClient, GlobalSignOutCommand } from "@aws-sdk/client-cognito-identity-provider";
 
-export async function signoutService(cognitoClient : CognitoIdentityServiceProvider, accessToken: string) {
+export async function signoutService(cognitoClient : CognitoIdentityProviderClient, accessToken: string) {
     try {
-        await cognitoClient.globalSignOut({
+        await cognitoClient.send(new GlobalSignOutCommand({
             AccessToken: accessToken
-        }).promise();
+        }));
 
         return {
             success: true,
@@ -19,14 +19,14 @@ export async function signoutService(cognitoClient : CognitoIdentityServiceProvi
     }
 }
 
-export async function addUserToGroupService(cognitoClient : CognitoIdentityServiceProvider, groupName: string, userPoolId: string, userName: string) {
+export async function addUserToGroupService(cognitoClient : CognitoIdentityProviderClient, groupName: string, userPoolId: string, userName: string) {
     try {
 
-        await cognitoClient.adminAddUserToGroup({
+        await cognitoClient.send(new AdminAddUserToGroupCommand({
             GroupName: groupName,
             UserPoolId: userPoolId,
             Username: userName,
-        }).promise();
+        }));
 
         return {
             success: true,

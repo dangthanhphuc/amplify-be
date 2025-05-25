@@ -3,6 +3,7 @@ import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { env } from "$amplify/env/confirmSignUpPostMethodFnc";
 import { getCognitoClient, getRdsClient } from "../../../utils/clients";
 import { saveUserToRds } from "../../../services/rdsService";
+import { ConfirmSignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
 
 
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -22,11 +23,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const { email, confirmationCode } = requestBody;
 
     // 1. Confirm signup for the user
-    const result = await cognitoClient.confirmSignUp({
+    const result = await cognitoClient.send(new ConfirmSignUpCommand({
         ClientId: env.USER_POOL_CLIENT_ID,
         Username: email,
         ConfirmationCode: confirmationCode
-      }).promise();
+      }));
 
     return {
       statusCode: 200,

@@ -8,6 +8,7 @@ import { saveUserToRds } from "../../../services/rdsService";
 import { User } from "../../../interfaces/user";
 import { secret } from '@aws-amplify/backend';
 import { getSecret } from "../../../services/secretManagerService";
+import { SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
 
 
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -39,7 +40,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     };
 
     // 1. Signup user
-    const resultSignUp = await cognitoClient.signUp(params).promise();
+    const resultSignUp = await cognitoClient.send(new SignUpCommand(params));
     console.log("User signed up successfully:", resultSignUp);
 
     // 2. Add user to group
@@ -49,7 +50,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     // 3. Save user to RDS
     const rdsClient = getRdsClient();
     const user : User = {
-      id: resultSignUp.UserSub,
+      id: String(resultSignUp.UserSub),
       email: email,
       password: password,
       name: name,

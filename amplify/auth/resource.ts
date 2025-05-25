@@ -13,7 +13,7 @@ export const auth = defineAuth({
           fullname: 'name',
           profilePicture: 'picture',
         },
-        scopes: ['email', 'profile'],
+        scopes: ['email', 'profile', 'openid'],
       },
       facebook: {
         clientId: secret('FACEBOOK_CLIENT_ID'),

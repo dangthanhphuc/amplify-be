@@ -28,7 +28,7 @@ export const auth = defineAuth({
       callbackUrls: [
         'https://5d6vfgww47.execute-api.us-east-1.amazonaws.com/dev/auth/getTokenByCode', // Production
         // `${process.env.API_GATEWAY}/callback`, // Sandbox
-        'http://localhost:3000/api/auth', // Local development for web
+        'http://localhost:3000/callback', // Local development for web
         'https://main.d36mfx1qa7bp2e.amplifyapp.com/callback', // Local development for web
       ],
       logoutUrls: ['http://localhost:3000/logout']

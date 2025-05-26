@@ -26,12 +26,13 @@ export const auth = defineAuth({
         
       },
       callbackUrls: [
-        'https://merge-branch.d2zn9ox6azoj1b.amplifyapp.com//callback', // Local development for web
-        'http://localhost:3000/callback', // Local development for web
+        'https://main.d2zn9ox6azoj1b.amplifyapp.com/home',
+        'https://merge-branch.d2zn9ox6azoj1b.amplifyapp.com/home', // Local development for web
+        'http://localhost:3000/home', // Local development for web
         'https://5d6vfgww47.execute-api.us-east-1.amazonaws.com/dev/auth/getTokenByCode', // Production
 
       ],
-      logoutUrls: ['http://localhost:3000/logout']
+      logoutUrls: ['http://localhost:3000/logout', 'https://main.d2zn9ox6azoj1b.amplifyapp.com/logout']
     }
   },
   userAttributes: {

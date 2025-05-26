@@ -44,7 +44,7 @@ const { outputs: restApiOutputs } = createRestApiStack(backend);
 // Configure OAuth settings for the User Pool Client
 const { cfnResources } = backend.auth.resources;
 if (cfnResources.cfnUserPoolClient) {
-  cfnResources.cfnUserPoolClient.allowedOAuthFlows = ['code', 'implicit']; 
+  cfnResources.cfnUserPoolClient.allowedOAuthFlows = ['code']; 
   cfnResources.cfnUserPoolClient.allowedOAuthFlowsUserPoolClient = true;
   cfnResources.cfnUserPoolClient.allowedOAuthScopes = ['email', 'openid', 'profile'];
 

@@ -21,7 +21,7 @@ import { postConfirmationFnc } from './functions/auth/postConfirmation/handler';
 // Define backend with Aurora RDS integration
 export const backend = defineBackend({
   auth,
-  data,
+  // data,
   storageForProject,
   signUpPostMethodFnc,
   signInPostMethodFnc,
@@ -160,6 +160,7 @@ backend.chatWithAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
     'bedrock:ListAgents',
     'bedrock:GetAgent',
     'bedrock:InvokeAgent',
+    'bedrock:RetrieveAndGenerate',
     'bedrock:ListAgentCategories',
     'bedrock:ListAgentAliases',
     'bedrock:InvokeModel',

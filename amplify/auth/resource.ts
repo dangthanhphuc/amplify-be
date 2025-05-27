@@ -33,8 +33,8 @@ export const auth = defineAuth({
 
       ],
       logoutUrls: [
-        'http://localhost:3000//sign-out-callback',
-        'https://main.d2zn9ox6azoj1b.amplifyapp.com/sign-out-callback'
+        'http://localhost:3000/auth',
+        'https://main.d2zn9ox6azoj1b.amplifyapp.com/auth'
       ]
     }
   },

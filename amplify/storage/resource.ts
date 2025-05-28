@@ -9,7 +9,8 @@ export const storageForProject = defineStorage({
             allow.entity("identity").to(['read', 'write', 'delete'])
         ],
         'public-images/*': [
-            allow.guest.to(['read'])
+            allow.guest.to(['read']),
+            allow.authenticated.to(['read']),
         ]
     })
 });

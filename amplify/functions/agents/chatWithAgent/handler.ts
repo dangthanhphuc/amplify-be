@@ -3,14 +3,20 @@ import {
   BedrockAgentRuntimeClient,
   InvokeAgentCommand,
 } from "@aws-sdk/client-bedrock-agent-runtime";
-import { getBedrockAgentRuntimeClient } from "../../../utils/clients";
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   if (!event.body) {
     return {
       statusCode: 404,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+          "Cache-Control": "no-cache"
+      },
       body: JSON.stringify({
-        message: "No request body",
+        message: "No request body"
       }),
     };
   }
@@ -28,6 +34,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const bedrockAgentRuntime = new BedrockAgentRuntimeClient({
       region: "us-east-1",
     });
+
     const command = new InvokeAgentCommand({
       agentId: agentId,
       agentAliasId: agentAliasId,
@@ -56,19 +63,17 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }
     }
 
-    // const response = await invokeAgentCommand(bedrockAgentRuntime, command, sessionId);
-
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        message: "Success",
-        headers: {
+      headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
           "Cache-Control": "no-cache"
-        },
+      },
+      body: JSON.stringify({
+        message: "Success",
         body: {
           response: completion,
           sessionId: sessionId,
@@ -80,6 +85,13 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     console.error("Error log: ", error);
     return {
       statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+          "Cache-Control": "no-cache"
+      },
       body: JSON.stringify({
         message: "Error",
         body: error,
@@ -87,6 +99,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     };
   }
 };
+
 
 // export const handler : APIGatewayProxyHandler = async (event) => {
 //     try {

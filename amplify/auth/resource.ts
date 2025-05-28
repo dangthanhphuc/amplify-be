@@ -63,6 +63,7 @@ export const auth = defineAuth({
   accountRecovery: 'EMAIL_ONLY',
   groups: ["USERS", "EXPERTS", "ADMINS"],
   // triggers: { 
-  //   postConfirmation: postConfirmationFnc
+  //   postConfirmation: postConfirmationFnc,
+    
   // }
 });

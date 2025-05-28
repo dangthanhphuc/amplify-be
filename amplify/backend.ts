@@ -7,7 +7,7 @@ import { signInPostMethodFnc } from './functions/auth/signin/resources';
 import { confirmSignUpPostMethodFnc } from './functions/auth/confirmSignUp/resources';
 import { signInWithRedirectGoogleFnc } from './functions/auth/signInWithRedirectGoogle/resources';
 import { signInWithRedirectFacebookFnc } from './functions/auth/signInWithRedirectFacebook/resources';
-import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { ArnPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { getTokenByCodeFnc } from './functions/auth/token/resources';
 import { getAgentsFnc } from './functions/agents/get/resources';
 import { initialDataForAiAgentFnc } from './functions/agents/initial-data/resources';
@@ -17,6 +17,8 @@ import { storageForProject } from './storage/resource';
 import { getUserInfoFnc } from './functions/users/getUserInfo/resource';
 import { updateUserFnc } from './functions/users/updateUser/resource';
 import { postConfirmationFnc } from './functions/auth/postConfirmation/handler';
+import { Stack } from 'aws-cdk-lib';
+import {CfnBucket} from 'aws-cdk-lib/aws-s3';
 
 // Define backend with Aurora RDS integration
 export const backend = defineBackend({
@@ -66,6 +68,32 @@ cfnUserPool.policies = {
     requireUppercase: false
   },
 };
+
+
+
+const s3Bucket = backend.storageForProject.resources.bucket;
+const cfnBucket = s3Bucket.node.defaultChild as CfnBucket;
+cfnBucket.accelerateConfiguration = {
+  accelerationStatus: "Enabled" // 'Suspended' if you want to disable transfer acceleration
+}
+
+// const accountId = Stack.of(backend.storageForProject.resources.bucket).account;
+
+// backend.storageForProject.resources.bucket.addToResourcePolicy(new PolicyStatement({
+//   effect: Effect.ALLOW,
+//   actions: [
+//     's3:GetObject',
+//     's3:PutObject',
+//     's3:DeleteObject',
+//     's3:ListBucket',
+//   ],
+//   resources: [`*`],
+//   principals: [
+//     new ArnPrincipal(`arn:aws:iam::${accountId}:root`)
+//   ]
+// }));
+
+
 
 backend.postConfirmationFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,

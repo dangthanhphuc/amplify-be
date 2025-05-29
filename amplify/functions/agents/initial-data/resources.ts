@@ -5,5 +5,6 @@ export const initialDataForAiAgentFnc = defineFunction({
     environment: {
         RDS_ARN: secret("RDS_ARN"),
         RDS_DATABASE: secret("RDS_DATABASE")
-    }
+    },
+    timeoutSeconds: 60
 });

@@ -12,5 +12,6 @@ export const storageForProject = defineStorage({
             allow.guest.to(['read']),
             allow.authenticated.to(['read']),
         ]
-    })
+    }),
+    
 });

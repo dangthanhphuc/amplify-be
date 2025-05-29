@@ -9,6 +9,9 @@ import {
 import { AiAgent } from "../interfaces/aiAgent";
 import {
   BatchExecuteStatementCommand,
+  BeginTransactionCommand,
+  CommitTransactionCommand,
+  ExecuteStatementCommand,
   RDSDataClient,
 } from "@aws-sdk/client-rds-data";
 import {
@@ -19,13 +22,13 @@ import {
   BedrockAgentRuntimeClient,
   InvokeAgentCommand,
 } from "@aws-sdk/client-bedrock-agent-runtime";
+import { match } from "assert";
 
 export async function invokeAgentCommand(
   bedrockAgentRuntimeClient: BedrockAgentRuntimeClient,
   command: InvokeAgentCommand,
-  sessionId : string
+  sessionId: string
 ) {
-
   const response = await bedrockAgentRuntimeClient.send(command);
 
   let completion = "";
@@ -53,17 +56,21 @@ export async function invokeAgentCommand(
   return {
     response: completion,
     sessionId: sessionId,
-    trace:traces
+    trace: traces,
   };
-  
 }
 
 export async function getAllAgentsAndConvertAiAgent(
-  bedrockClient: BedrockAgentClient
+  bedrockClient: BedrockAgentClient,
+  rdsClient: RDSDataClient,
+  secretArn: string,
+  rdsArn: string,
+  rdsDatabase: string
 ): Promise<AiAgent[]> {
-  const aiAgents: AiAgent[] = [];
   const maxResults = 10;
   let nextToken = undefined;
+  // 1. Get all agents from Bedrock
+  const agentsBebrock: AgentSummary[] = [];
   do {
     const bedrockResponse: ListAgentsCommandOutput = await bedrockClient.send(
       new ListAgentsCommand({
@@ -71,72 +78,107 @@ export async function getAllAgentsAndConvertAiAgent(
         nextToken,
       })
     );
-    console.log(
-      "Bedrock response: agentSummaries",
-      bedrockResponse.agentSummaries
-    );
-    if (bedrockResponse.agentSummaries) {
-      const agentPromises = bedrockResponse.agentSummaries.map(
-        async (agent) => {
-          const aiAgentAlias: (string | undefined)[] = [];
-          const agentId = agent.agentId;
-          const maxTokenAlias = 10;
-          let nextTokenAlias = undefined;
-
-          // Get aliasIds on agentId
-          do {
-            const aiAgentAliasResponse: ListAgentAliasesResponse =
-              await bedrockClient.send(
-                new ListAgentAliasesCommand({
-                  maxResults: maxTokenAlias,
-                  nextToken: nextTokenAlias,
-                  agentId,
-                })
-              );
-            aiAgentAlias.push(
-              ...(aiAgentAliasResponse.agentAliasSummaries?.map(
-                (alias) => alias.agentAliasId
-              ) ?? [])
-            );
-            nextTokenAlias = aiAgentAliasResponse.nextToken;
-          } while (nextTokenAlias != undefined);
-
-          // Chuyển đổi alias thành mảng string
-          const aiAgentAliasStrings: string[] = aiAgentAlias.filter(
-            (id): id is string => typeof id === "string"
-          );
-          console.log("AI Agent Alias:", aiAgentAliasStrings);
-
-          const aiAgent: AiAgent = {
-            id: agent.agentId || "",
-            aliasIds: aiAgentAliasStrings,
-            name: agent.agentName || "",
-            status: agent.agentStatus || "",
-            description: agent.description || "",
-            lastVersion: agent.latestAgentVersion || "",
-            knowledgeBaseUrl: "",
-            likeCount: 0,
-            totalInteractions: 0,
-            creatorId: 1,
-            introduction: "",
-            icon: "",
-            foreword: "",
-            sysPrompt: "",
-            createAt: new Date(),
-            model: "",
-            capabilities: [],
-            cost: 0,
-          };
-          console.log("AI Agent:", aiAgent);
-          return aiAgent;
-        }
-      );
-      const newAgents = await Promise.all(agentPromises);
-      aiAgents.push(...newAgents);
-    }
-
+    agentsBebrock.push(...(bedrockResponse.agentSummaries || []));
     nextToken = bedrockResponse.nextToken;
   } while (nextToken != null);
+  console.log("Bedrock response: agentsBebrock", agentsBebrock);
+
+  // 2. Filter the agents not added yet
+  const idsAgentSavedResult = rdsClient.send(
+    new ExecuteStatementCommand({
+      resourceArn: rdsArn,
+      secretArn: secretArn,
+      database: rdsDatabase,
+      sql: `SELECT id FROM ai_agents WHERE id IN (${agentsBebrock.map((agent) => `'${agent.agentId}'`).join(", ")})`,
+    })
+  );
+  console.log("IDs of agents already saved:", await idsAgentSavedResult);
+
+  const idsAgentSaved = ((await idsAgentSavedResult).records || [])
+    .map((record) => record[0].stringValue)
+    .filter(
+      (id) =>
+        id != undefined && agentsBebrock.some((agent) => agent.agentId === id)
+    )
+    .filter((id): id is string => typeof id === "string");
+  console.log("IDs of agents saved:", idsAgentSaved);
+
+  const agentsNotSaved = agentsBebrock.filter((agent) =>
+    idsAgentSaved.some((id) => {
+      const result = id != agent.agentId;
+      console.log(
+        `Checking agent: ${agent.agentId}, Against saved ID: ${id}, Result: ${result}`
+      );
+      return result;
+    })
+  );
+  console.log("Agents not saved yet:", agentsNotSaved);
+
+  // 3. Proccess data for agents not saved yet
+  const aiAgents: AiAgent[] = [];
+  const agentSummaries =
+    agentsNotSaved.length > 0 ? agentsNotSaved : agentsBebrock;
+  console.log("Agent summaries to process:", agentSummaries);
+  const agentPromises = agentSummaries.map(async (agent) => {
+    const aiAgentAlias: (string | undefined)[] = [];
+    const agentId = agent.agentId;
+    const maxTokenAlias = 10;
+    let nextTokenAlias = undefined;
+
+    // Get aliasIds on agentId
+    do {
+      const aiAgentAliasResponse: ListAgentAliasesResponse =
+        await bedrockClient.send(
+          new ListAgentAliasesCommand({
+            maxResults: maxTokenAlias,
+            nextToken: nextTokenAlias,
+            agentId,
+          })
+        );
+      aiAgentAlias.push(
+        ...(aiAgentAliasResponse.agentAliasSummaries?.map(
+          (alias) => alias.agentAliasId
+        ) ?? [])
+      );
+      nextTokenAlias = aiAgentAliasResponse.nextToken;
+    } while (nextTokenAlias != undefined);
+
+    // Chuyển đổi alias thành mảng string
+    const aiAgentAliasStrings: string[] = aiAgentAlias.filter(
+      (id): id is string => typeof id === "string"
+    );
+    console.log("AI Agent Alias:", aiAgentAliasStrings);
+    const now = new Date();
+    const msInDay = 24 * 60 * 60 * 1000;
+    const randomDays = Math.floor(Math.random() * 20);
+    const randomDate = new Date(now.getTime() - randomDays * msInDay);
+
+    const aiAgent: AiAgent = {
+      id: agentId || "",
+      aliasIds: aiAgentAliasStrings,
+      name: agent.agentName || "",
+      status: agent.agentStatus || "",
+      description: agent.description || "",
+      lastVersion: agent.latestAgentVersion || "",
+      knowledgeBaseUrl: "",
+      likeCount: 0,
+      totalInteractions: 0,
+      creatorId: 1,
+      introduction:
+        'Xin chào! Tôi là Agent sách "Heal Your Money Energy" của Ankur và Bell. Tôi có thể hỗ trợ bạn đọc cuốn sách này hiểu và chuyển đổi mối quan hệ của bạn với tiền bạc',
+      icon: "public-images/ai.png",
+      foreword: "",
+      sysPrompt: "",
+      createAt: randomDate,
+      model: "",
+      capabilities: [],
+      cost: 0,
+    };
+    console.log("AI Agent:", aiAgent);
+    return aiAgent;
+  });
+  const newAgents = await Promise.all(agentPromises);
+  aiAgents.push(...newAgents);
 
   return aiAgents;
 }
@@ -171,9 +213,27 @@ export async function initialDataForAiAgent(
   bedrockClient: BedrockAgentClient
 ) {
   try {
-    const aiAgents: AiAgent[] =
-      await getAllAgentsAndConvertAiAgent(bedrockClient);
+    const secret = await secretManagerClient.send(
+      new GetSecretValueCommand({ SecretId: "prod/RDS_SECRET_ARN" })
+    );
+    console.log("Secret", secret);
+
+    const aiAgents: AiAgent[] = await getAllAgentsAndConvertAiAgent(
+      bedrockClient,
+      rdsClient,
+      secret.ARN ?? "",
+      rdsArn,
+      rdsDatabase
+    );
     console.log("AI Agents:", aiAgents);
+    // Begin transaction to insert agents into RDS
+    const beginTransactionCommand = new BeginTransactionCommand({
+      resourceArn: rdsArn,
+      secretArn: secret.ARN,
+      database: rdsDatabase,
+    });
+    const beginResult = await rdsClient.send(beginTransactionCommand);
+    const transactionId = beginResult.transactionId;
 
     const parameterSets = aiAgents.map((agent) => [
       { name: "id", value: { stringValue: agent.id } },
@@ -219,15 +279,11 @@ export async function initialDataForAiAgent(
       },
     ]);
 
-    const secret = await secretManagerClient.send(
-      new GetSecretValueCommand({ SecretId: "prod/RDS_SECRET_ARN" })
-    );
-    console.log("Secret", secret);
-
     const command = new BatchExecuteStatementCommand({
       resourceArn: rdsArn,
       secretArn: secret.ARN,
       database: rdsDatabase,
+      transactionId: transactionId,
       sql: `
               INSERT INTO ai_agents (
                   id, name, status, description, last_version, knowledge_base_url,
@@ -245,6 +301,59 @@ export async function initialDataForAiAgent(
 
     const result = await rdsClient.send(command);
     console.log("RDS send command successful");
+
+    // Random categories for ai agents
+
+    const randomCategoriesForAgent = (agentId: string, quantity: number) => {
+      const categoryIds: number[] = [];
+      for (let i = 0; i < quantity; i++) {
+        const randomCategoryId = Math.ceil(Math.random() * 10);
+        if (!categoryIds.includes(randomCategoryId)) {
+          categoryIds.push(randomCategoryId);
+        }
+      }
+      return categoryIds.map((categoryId) => ({ agentId, categoryId }));
+    };
+
+    const categoriesForAgent = aiAgents
+      .map((agent) => {
+        const random = Math.ceil(Math.random() * 3);
+        return randomCategoriesForAgent(agent.id, random);
+      })
+      .flatMap((item) =>
+        item.map((object) => ({
+          agentId: object.agentId,
+          categoryId: object.categoryId,
+        }))
+      );
+      console.log("Categories for agents:", categoriesForAgent);
+
+    const resultInsertCategoriesForAgent = await rdsClient.send(
+      new BatchExecuteStatementCommand({
+        resourceArn: rdsArn,
+        secretArn: secret.ARN,
+        database: rdsDatabase,
+        transactionId: transactionId,
+        sql: `
+          INSERT INTO ai_categories (ai_agent_id, agent_category_id)
+          VALUES (:agentId, :categoryId)
+        `,
+        parameterSets: categoriesForAgent.map((item) => [
+          { name: "agentId", value: { stringValue: item.agentId } },
+          { name: "categoryId", value: { longValue: item.categoryId } }, 
+        ]),
+      })
+    );
+    console.log("ResultInsertCategoriesForAgent send command successful");
+
+    // Commit transaction
+    const commitCommand = new CommitTransactionCommand({
+      resourceArn: rdsArn,
+      secretArn: secret.ARN,
+      transactionId,
+    });
+    const commitResult = await rdsClient.send(commitCommand);
+    console.log("Transaction committed successfully:", commitResult);
 
     return JSON.stringify({
       result,

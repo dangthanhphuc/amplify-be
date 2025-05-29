@@ -1,6 +1,5 @@
 import { a, defineData, type ClientSchema } from "@aws-amplify/backend";
 import { schema as generatedSqlSchema } from "./schema.sql";
-import { getAgentsFnc } from "../functions/agents/get/resources";
 
 const sqlSchema = generatedSqlSchema
   .renameModels(() => [

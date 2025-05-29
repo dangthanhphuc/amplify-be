@@ -6,7 +6,7 @@ import { secret } from "@aws-amplify/backend";
 
 export const schema = configure({
     database: {
-        identifier: "IDXRmlBfQHJsV6kbPSod9g",
+        identifier: "IDafPMCwxtKYEBA8e4Qfjw",
         engine: "mysql",
         connectionUri: secret("SQL_CONNECTION_STRING"),
         vpcConfig: {
@@ -43,9 +43,34 @@ export const schema = configure({
         }
     }
 }).schema({
+    "roles": a.model({
+        id: a.integer().required(),
+        name: a.string().required()
+    }).identifier([
+        "id"
+    ]),
     "agent_categories": a.model({
         id: a.integer().required(),
         name: a.string().required()
+    }).identifier([
+        "id"
+    ]),
+    "report_categories": a.model({
+        id: a.integer().required(),
+        name: a.string().required(),
+        reversity: a.integer()
+    }).identifier([
+        "id"
+    ]),
+    "users": a.model({
+        id: a.string().required(),
+        email: a.string(),
+        password: a.string(),
+        name: a.string(),
+        display_name: a.string(),
+        profile_image: a.string(),
+        description: a.string(),
+        role_id: a.integer()
     }).identifier([
         "id"
     ]),
@@ -60,7 +85,7 @@ export const schema = configure({
         status: a.string(),
         like_count: a.integer(),
         total_interactions: a.integer(),
-        creator_id: a.integer(),
+        creator_id: a.string(),
         knowledge_base_url: a.string(),
         sys_prompt: a.string(),
         create_at: a.datetime(),
@@ -78,13 +103,22 @@ export const schema = configure({
         "ai_agent_id",
         "agent_category_id"
     ]),
+    "user_likes": a.model({
+        user_id: a.string().required(),
+        ai_agent_id: a.string().required(),
+        liked: a.integer(),
+        create_at: a.datetime()
+    }).identifier([
+        "user_id",
+        "ai_agent_id"
+    ]),
     "ai_reviews": a.model({
         id: a.integer().required(),
         description: a.string(),
         rating: a.integer(),
         create_at: a.datetime(),
         ai_agent_id: a.string(),
-        reporter_id: a.integer(),
+        reporter_id: a.string(),
         report_categories_id: a.integer()
     }).identifier([
         "id"
@@ -93,40 +127,8 @@ export const schema = configure({
         id: a.integer().required(),
         raw_content: a.string(),
         create_at: a.datetime(),
-        user_id: a.integer(),
+        user_id: a.string(),
         ai_agent_id: a.string()
-    }).identifier([
-        "id"
-    ]),
-    "report_categories": a.model({
-        id: a.integer().required(),
-        name: a.string().required(),
-        reversity: a.integer()
-    }).identifier([
-        "id"
-    ]),
-    "roles": a.model({
-        id: a.integer().required(),
-        name: a.string().required()
-    }).identifier([
-        "id"
-    ]),
-    "user_likes": a.model({
-        user_id: a.integer().required(),
-        ai_agent_id: a.string().required(),
-        liked: a.integer(),
-        create_at: a.datetime()
-    }).identifier([
-        "user_id",
-        "ai_agent_id"
-    ]),
-    "users": a.model({
-        id: a.integer().required(),
-        name: a.string(),
-        display_name: a.string(),
-        profile_image: a.string(),
-        description: a.string(),
-        role_id: a.integer()
     }).identifier([
         "id"
     ])

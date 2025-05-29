@@ -7,7 +7,7 @@ import { signInPostMethodFnc } from './functions/auth/signin/resources';
 import { confirmSignUpPostMethodFnc } from './functions/auth/confirmSignUp/resources';
 import { signInWithRedirectGoogleFnc } from './functions/auth/signInWithRedirectGoogle/resources';
 import { signInWithRedirectFacebookFnc } from './functions/auth/signInWithRedirectFacebook/resources';
-import { ArnPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { getTokenByCodeFnc } from './functions/auth/token/resources';
 import { getAgentsFnc } from './functions/agents/get/resources';
 import { initialDataForAiAgentFnc } from './functions/agents/initial-data/resources';
@@ -17,13 +17,19 @@ import { storageForProject } from './storage/resource';
 import { getUserInfoFnc } from './functions/users/getUserInfo/resource';
 import { updateUserFnc } from './functions/users/updateUser/resource';
 import { postConfirmationFnc } from './functions/auth/postConfirmation/handler';
-import { Stack } from 'aws-cdk-lib';
 import {CfnBucket} from 'aws-cdk-lib/aws-s3';
+import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+// Tạo __dirname cho ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Define backend with Aurora RDS integration
 export const backend = defineBackend({
   auth,
-  // data,
+  data,
   storageForProject,
   signUpPostMethodFnc,
   signInPostMethodFnc,
@@ -70,12 +76,17 @@ cfnUserPool.policies = {
 };
 
 
-
 const s3Bucket = backend.storageForProject.resources.bucket;
 const cfnBucket = s3Bucket.node.defaultChild as CfnBucket;
 cfnBucket.accelerateConfiguration = {
   accelerationStatus: "Enabled" // 'Suspended' if you want to disable transfer acceleration
 }
+
+new BucketDeployment(backend.storageForProject.stack, "BucketDeployment", {
+  sources: [Source.asset(path.join(__dirname, 'storage/public-images'))],
+  destinationBucket: s3Bucket,
+  destinationKeyPrefix: 'public-images/', // optional prefix in the bucket
+});
 
 // const accountId = Stack.of(backend.storageForProject.resources.bucket).account;
 
@@ -117,6 +128,10 @@ backend.initialDataForAiAgentFnc.resources.lambda.addToRolePolicy(new PolicyStat
     'bedrock:GetAgent',
     'bedrock:ListAgentCategories',
     'bedrock:ListAgentAliases',
+    'rds-data:ExecuteStatement',
+    'rds-data:BatchExecuteStatement',
+    'rds-data:BeginTransaction',
+    'rds-data:CommitTransaction',
     'secretsmanager:GetSecretValue',
     'rds-data:BatchExecuteStatement'
   ],

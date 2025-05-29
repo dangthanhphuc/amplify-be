@@ -54,7 +54,7 @@ const sqlSchema = generatedSqlSchema
       roles: a.belongsTo("Roles", "role_id"),
       ai_agents: a.hasMany("AiAgents", "creator_id"),
     }),
-  ]);
+  ]).authorization((allow) => allow.guest());
 
 // const schema = a.schema({
 //   Todo: a.model({

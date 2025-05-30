@@ -52,6 +52,7 @@ CREATE TABLE ai_agents (
     capabilities JSON,
     alias_ids JSON,
     cost FLOAT,
+    suggestedQuestions JSON,
     FOREIGN KEY (creator_id) REFERENCES users(id)
 );
 

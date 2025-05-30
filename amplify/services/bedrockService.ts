@@ -173,6 +173,11 @@ export async function getAllAgentsAndConvertAiAgent(
       model: "",
       capabilities: [],
       cost: 0,
+      suggestQuestions: [
+        "Cuốn sách này nói gì về mối quan hệ với tiền bạc?",
+        "Làm sao để chữa lành năng lượng tiền bạc?",
+        "Tác giả đưa ra phương pháp nào cụ thể?",
+      ]
     };
     console.log("AI Agent:", aiAgent);
     return aiAgent;
@@ -277,6 +282,10 @@ export async function initialDataForAiAgent(
         name: "aliasIds",
         value: { stringValue: JSON.stringify(agent.aliasIds) },
       },
+      {
+        name: "suggestQuestions",
+        value: { stringValue: JSON.stringify(agent.suggestQuestions) },
+      },
     ]);
 
     const command = new BatchExecuteStatementCommand({
@@ -288,12 +297,12 @@ export async function initialDataForAiAgent(
               INSERT INTO ai_agents (
                   id, name, status, description, last_version, knowledge_base_url,
                   like_count, total_interactions, creator_id, introduction, icon,
-                  foreword, sys_prompt, create_at, model, capabilities, cost, alias_ids
+                  foreword, sys_prompt, create_at, model, capabilities, cost, alias_ids, suggested_questions
               )
               VALUES (
                   :id, :name, :status, :description, :lastVersion, :knowledgeBaseUrl,
                   :likeCount, :totalInteractions, :creatorId, :introduction, :icon,
-                  :foreword, :sysPrompt, :createAt, :model, :capabilities, :cost, :aliasIds
+                  :foreword, :sysPrompt, :createAt, :model, :capabilities, :cost, :aliasIds, :suggestQuestions
               )
           `,
       parameterSets,

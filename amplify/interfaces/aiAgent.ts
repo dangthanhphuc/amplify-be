@@ -17,4 +17,5 @@ export interface AiAgent {
     model: string | undefined;
     capabilities: string[];
     cost: number;
+    suggestQuestions: string[];
 }

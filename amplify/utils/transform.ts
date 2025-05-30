@@ -60,6 +60,7 @@ export async function transformAgentSummariesToModels(
       model: "",
       capabilities: [],
       cost: 0,
+      suggestQuestions: [],
     };
     console.log("AI Agent:", aiAgent);
     return aiAgent;

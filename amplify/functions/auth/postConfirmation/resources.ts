@@ -1,5 +1,4 @@
 import type {  PostConfirmationTriggerHandler } from "aws-lambda";
-// import { User } from "../../../interfaces/user";
 
 export const handler: PostConfirmationTriggerHandler = async (event) => {
   

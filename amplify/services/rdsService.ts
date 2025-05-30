@@ -78,13 +78,14 @@ export async function getAllAiAgents(rdsClient: RDSDataClient, resourceArn: stri
                     a.alias_ids,             -- record[16]
                     a.cost,                  -- record[17]
                     u.name as creator_name,  -- record[18]
+                    a.suggested_questions, -- record[19]
                     JSON_ARRAYAGG(
                         CASE 
                             WHEN ac.name IS NOT NULL 
                             THEN JSON_OBJECT('id', ac.id, 'name', ac.name) 
                             ELSE NULL 
                         END
-                    ) as categories          -- record[19]
+                    ) as categories          -- record[20]
                 FROM ai_agents a
                 LEFT JOIN ai_categories aic ON a.id = aic.ai_agent_id
                 LEFT JOIN users u ON a.creator_id = u.id
@@ -118,8 +119,10 @@ export async function getAllAiAgents(rdsClient: RDSDataClient, resourceArn: stri
                 JSON.parse(record[16].stringValue) : [],
             cost: record[17]?.doubleValue || 0,                  // a.cost
             creatorName: record[18]?.stringValue || '',          // u.name
-            categories: record[19]?.stringValue ?                // JSON_ARRAYAGG(...)
-                JSON.parse(record[19].stringValue).filter((cat: any) => cat !== null) : []
+            suggestedQuestions: record[19]?.stringValue ?        // a.suggested_questions
+                JSON.parse(record[19].stringValue) : [],
+            categories: record[20]?.stringValue ?                // JSON_ARRAYAGG(...)
+                JSON.parse(record[20].stringValue).filter((cat: any) => cat !== null) : []
         })) || [];
         console.log("AI Agents fetched from RDS:", aiAgentResponse);
 

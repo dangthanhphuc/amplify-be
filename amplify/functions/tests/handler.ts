@@ -1,51 +1,73 @@
-import type { APIGatewayProxyHandler } from "aws-lambda";
-import {
-  BedrockAgentClient,
-  AgentSummary
-} from "@aws-sdk/client-bedrock-agent";
-import { getBedrockClient } from "../../utils/clients";
-import { getAllBedrockAgents } from "../../services/bedrockService";
+import { BedrockRuntimeClient, InvokeModelWithResponseStreamCommand } from "@aws-sdk/client-bedrock-runtime";
 
-export const handler: APIGatewayProxyHandler = async (event) => {
+export const handler = awslambda.streamifyResponse(async (event, responseStream) => {
   try {
-    const bedrockClient = getBedrockClient();
+    const bedrockRuntimeClient = new BedrockRuntimeClient({
+      region: "us-east-1",
+    });
 
-    // 1. Lấy danh sách agents từ Bedrock (Chưa xử lý nextToken)
-    const maxResults = event.queryStringParameters?.maxResults;
-    const nextToken = event.queryStringParameters?.nextToken;
-    if (!maxResults || isNaN(Number(maxResults)))
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          message: "Missing maxResults parameter",
-        }),
-      };
-    else {
-      const listAgentsSummary: AgentSummary[] = [];
+    const requestBody = JSON.parse(event.body);
+    const { prompt, agentId, agentAliasId, sessionId } = requestBody;
 
-      const bedrockResponse = await getAllBedrockAgents(Number(maxResults), undefined, bedrockClient);
-
-      listAgentsSummary.push(...(bedrockResponse || []));
-
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          message: "Hello from the API function!",
-          body: {
-            agentCategories: listAgentsSummary,
-          },
-        }),
-      };
-    }
-
-  } catch (error: any) {
-    console.error("Error fetching agents:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: "Error fetching agents",
-        error: error,
-      }),
-    };
+    const payload = {
+  inputText: prompt,
+  textGenerationConfig: {
+    maxTokenCount: 1024,
+    temperature: 0.7,
+    topP: 0.9
   }
 };
+
+    const command = new InvokeModelWithResponseStreamCommand({
+      modelId: "amazon.titan-text-express-v1",
+      contentType: "application/json",
+      body: JSON.stringify(payload)
+    })
+        
+    const response = await bedrockRuntimeClient.send(command);
+
+    let completion = "";
+    const traces: any[] = [];
+    const chunks: string[] = [];
+
+    responseStream = awslambda.HttpResponseStream.from(responseStream, {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Transfer-Encoding": "chunked",
+        Connection: "keep-alive",
+        "Cache-Control": "no-cache",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+      }
+    });
+
+    if(response.body){
+      for await (const chunk of response.body) {
+       const parsed = JSON.parse(new TextDecoder().decode(chunk.chunk?.bytes));
+       if(parsed.type === "content_block_delta") {
+        responseStream.write(parsed.delta.text);
+       }
+      }
+      responseStream.end();
+    }
+
+    return;
+  } catch (error: any) {
+    console.error("Error log: ", error);
+    responseStream = awslambda.HttpResponseStream.from(responseStream, {
+        statusCode: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+            "Cache-Control": "no-cache"
+        }
+    });  
+    responseStream.write(JSON.stringify({error: error.message}));
+    responseStream.end();
+    return ;
+  }
+});

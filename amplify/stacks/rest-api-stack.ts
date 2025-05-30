@@ -72,7 +72,7 @@ export function createRestApiStack(backend: any) {
     backend.initialDataForAiAgentFnc.resources.lambda
   );
 
-  const lambdaForChatWithAgent = createLambdaIntegrationResponse(
+  const lambdaForChatWithAgent = new LambdaIntegration(
     backend.chatWithAgentFnc.resources.lambda
   );
 
@@ -142,7 +142,7 @@ export function createRestApiStack(backend: any) {
   // Test resource
   const testResource = restAPI.root.addResource("test");
   const testFnc = new LambdaIntegration(backend.testFnc.resources.lambda);
-  testResource.addMethod("GET", testFnc);
+  testResource.addMethod("POST", testFnc);
 
   // Return the REST API and outputs for use in the main backend.ts file
   return {

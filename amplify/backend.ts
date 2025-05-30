@@ -207,6 +207,8 @@ backend.chatWithAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
     'bedrock:ListAgentCategories',
     'bedrock:ListAgentAliases',
     'bedrock:InvokeModel',
+    'bedrock:InvokeModelWithResponseStream',
+    'bedrock:RetrieveAndGenerate',
     'secretsmanager:GetSecretValue',
     'rds-data:BatchExecuteStatement'
   ],

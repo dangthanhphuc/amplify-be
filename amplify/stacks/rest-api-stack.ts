@@ -41,29 +41,6 @@ export function createRestApiStack(backend: any) {
     cognitoUserPools: [backend.auth.resources.userPool],
   });
 
-  const lambdaForSignUp = new LambdaIntegration(
-    backend.signUpPostMethodFnc.resources.lambda
-  );
-
-  const lambdaForSignIn = new LambdaIntegration(
-    backend.signInPostMethodFnc.resources.lambda
-  );
-  const lambdaForConfirmSignUp = createLambdaIntegrationResponse(
-    backend.confirmSignUpPostMethodFnc.resources.lambda
-  );
-
-  const lambdaForSignInWithRedirectGoogle = createLambdaIntegrationResponse(
-    backend.signInWithRedirectGoogleFnc.resources.lambda
-  );
-
-  const lambdaForSignInWithRedirectFacebook = createLambdaIntegrationResponse(
-    backend.signInWithRedirectFacebookFnc.resources.lambda
-  );
-
-  const lambdaForGetTokenByCode = createLambdaIntegrationResponse(
-    backend.getTokenByCodeFnc.resources.lambda
-  );
-
   const lambdaForGetAgents = createLambdaIntegrationResponse(
     backend.getAgentsFnc.resources.lambda
   )
@@ -104,25 +81,7 @@ export function createRestApiStack(backend: any) {
 
 
   // Tạo auth resource
-  const authResource = restAPI.root.addResource("auth");
-
-  const signupResource = authResource.addResource("signup");
-  signupResource.addMethod("POST", lambdaForSignUp);
-
-  const signinResource = authResource.addResource("signin");
-  signinResource.addMethod("POST", lambdaForSignIn);
-
-  const confirmSignUpResource = authResource.addResource("confirm-signup");
-  confirmSignUpResource.addMethod("POST", lambdaForConfirmSignUp);
-
-  const signInWithRedirectGoogleResource = authResource.addResource("signInWithRedirectGoogle");
-  signInWithRedirectGoogleResource.addMethod("GET", lambdaForSignInWithRedirectGoogle);
-
-  const signInWithRedirectFacebookResource = authResource.addResource("signInWithRedirectFacebook");
-  signInWithRedirectFacebookResource.addMethod("GET", lambdaForSignInWithRedirectFacebook, methodOptionsForUsers);
-
-  const getTokenByCodeResource = authResource.addResource("getTokenByCode");
-  getTokenByCodeResource.addMethod("GET", lambdaForGetTokenByCode);
+  // const authResource = restAPI.root.addResource("auth");
 
   // Tạo agents resource
   const agentsResource = restAPI.root.addResource("agents");

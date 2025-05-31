@@ -1,10 +1,5 @@
 import {
-  AuthorizationType,
-  CognitoUserPoolsAuthorizer,
-  Cors,
   LambdaIntegration,
-  MethodOptions,
-  RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 
 export function createLambdaIntegrationResponse(lambda: any) {

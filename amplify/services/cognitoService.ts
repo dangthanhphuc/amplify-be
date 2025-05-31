@@ -39,3 +39,26 @@ export async function addUserToGroupService(cognitoClient : CognitoIdentityProvi
         throw error;
     }
 }
+
+
+export async function addUserToGroup(
+    cognitoClient : CognitoIdentityProviderClient,
+    groupName: string,
+    userPoolId: string,
+    userName: string    
+) {
+    
+const command = new AdminAddUserToGroupCommand({
+    GroupName: groupName,
+    Username: userName,
+    UserPoolId: userPoolId
+  });
+
+  try {
+    const result = await cognitoClient.send(command);
+    return "User added to group successfully";
+  } catch (error) {
+    console.error("Error adding user to group:", error);
+    throw error;
+  }
+}

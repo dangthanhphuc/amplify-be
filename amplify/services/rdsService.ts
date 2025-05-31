@@ -3,7 +3,6 @@ import { User } from "../interfaces/user";
 import bcrypt from "bcryptjs";
 import { getSecret } from "./secretManagerService";
 import { getSecretManagerClient } from "../utils/clients";
-import { AiAgent } from "../interfaces/aiAgent";
 import { AiAgentResponse } from "../interfaces/response/aiAgentResponse";
 
 export async function getUserInfo(rdsClient : RDSDataClient, userId: string, resourceArn: string, secretName: string) { 
@@ -124,6 +123,7 @@ export async function getAllAiAgents(rdsClient: RDSDataClient, resourceArn: stri
             categories: record[20]?.stringValue ?                // JSON_ARRAYAGG(...)
                 JSON.parse(record[20].stringValue).filter((cat: any) => cat !== null) : []
         })) || [];
+        
         console.log("AI Agents fetched from RDS:", aiAgentResponse);
 
         return aiAgentResponse;

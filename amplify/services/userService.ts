@@ -1,5 +1,4 @@
 import { ExecuteStatementCommand, RDSDataClient } from "@aws-sdk/client-rds-data";
-import { secret } from "@aws-amplify/backend";
 import { SignUpRequest } from "aws-sdk/clients/cognitoidentityserviceprovider";
 
 export enum UserGroup {

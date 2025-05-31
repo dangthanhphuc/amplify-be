@@ -1,6 +1,6 @@
 export interface AiAgent {
     id: string;
-    aliasIds: string[];
+    aliasIds: AliasIds[];
     name: string;
     status: string;
     description: string;
@@ -18,4 +18,9 @@ export interface AiAgent {
     capabilities: string[];
     cost: number;
     suggestQuestions: string[];
+}
+
+export interface AliasIds {
+    agentAliasId: string;
+    updateAt: string;
 }

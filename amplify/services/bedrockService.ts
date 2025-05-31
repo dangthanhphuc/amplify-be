@@ -6,7 +6,7 @@ import {
   ListAgentAliasesCommand,
   ListAgentAliasesResponse,
 } from "@aws-sdk/client-bedrock-agent";
-import { AiAgent } from "../interfaces/aiAgent";
+import { AiAgent, AliasIds } from "../interfaces/aiAgent";
 import {
   BatchExecuteStatementCommand,
   BeginTransactionCommand,
@@ -120,7 +120,7 @@ export async function getAllAgentsAndConvertAiAgent(
     agentsNotSaved.length > 0 ? agentsNotSaved : agentsBebrock;
   console.log("Agent summaries to process:", agentSummaries);
   const agentPromises = agentSummaries.map(async (agent) => {
-    const aiAgentAlias: (string | undefined)[] = [];
+    const aiAgentAlias: AliasIds[] = [];
     const agentId = agent.agentId;
     const maxTokenAlias = 10;
     let nextTokenAlias = undefined;
@@ -135,19 +135,23 @@ export async function getAllAgentsAndConvertAiAgent(
             agentId,
           })
         );
-      aiAgentAlias.push(
-        ...(aiAgentAliasResponse.agentAliasSummaries?.map(
-          (alias) => alias.agentAliasId
-        ) ?? [])
-      );
+        if (aiAgentAliasResponse.agentAliasSummaries) 
+          aiAgentAlias.push(
+            ...(aiAgentAliasResponse.agentAliasSummaries.map(
+              (alias) : AliasIds => ({
+                agentAliasId: alias.agentAliasId || "",
+                updateAt: alias.updatedAt ? alias.updatedAt.toISOString().replace(/\.\d{3}Z$/, "") : new Date().toISOString().replace(/\.\d{3}Z$/, "")
+              })
+            ) ?? [])
+          );
+        else{
+          console.warn(`No agentAliasSummaries found for agentId: ${agentId}`);
+        }
       nextTokenAlias = aiAgentAliasResponse.nextToken;
     } while (nextTokenAlias != undefined);
 
     // Chuyển đổi alias thành mảng string
-    const aiAgentAliasStrings: string[] = aiAgentAlias.filter(
-      (id): id is string => typeof id === "string"
-    );
-    console.log("AI Agent Alias:", aiAgentAliasStrings);
+    console.log("AI Agent Alias:", aiAgentAlias);
     const now = new Date();
     const msInDay = 24 * 60 * 60 * 1000;
     const randomDays = Math.floor(Math.random() * 20);
@@ -155,7 +159,7 @@ export async function getAllAgentsAndConvertAiAgent(
 
     const aiAgent: AiAgent = {
       id: agentId || "",
-      aliasIds: aiAgentAliasStrings,
+      aliasIds: aiAgentAlias,
       name: agent.agentName || "",
       status: agent.agentStatus || "",
       description: agent.description || "",

@@ -12,6 +12,7 @@
     "devDependencies": {
         "@aws-amplify/backend": "^1.16.1",
         "@aws-amplify/backend-cli": "^1.7.1",
+        "@types/aws-lambda": "^8.10.149",
         "@types/node": "^22.15.17",
         "aws-sdk": "^2.1692.0",
         "constructs": "^10.4.2",

@@ -3,7 +3,7 @@ import {
   ListAgentAliasesCommand,
   ListAgentAliasesResponse,
 } from "@aws-sdk/client-bedrock-agent";
-import { AiAgent } from "../interfaces/aiAgent";
+import { AiAgent, AliasIds } from "../interfaces/aiAgent";
 import { getBedrockClient } from "./clients";
 
 export async function transformAgentSummariesToModels(
@@ -12,7 +12,7 @@ export async function transformAgentSummariesToModels(
   const aiAgents: AiAgent[] = [];
   const bedrockClient = getBedrockClient();
   const agentPromises = agentSummaries.map(async (agent) => {
-    const aiAgentAlias: (string | undefined)[] = [];
+    const aiAgentAlias: AliasIds[] = [];
     const agentId = agent.agentId;
     const maxTokenAlias = 10;
     let nextTokenAlias = undefined;
@@ -27,23 +27,25 @@ export async function transformAgentSummariesToModels(
             agentId,
           })
         );
-      aiAgentAlias.push(
-        ...(aiAgentAliasResponse.agentAliasSummaries?.map(
-          (alias) => alias.agentAliasId
-        ) ?? [])
-      );
+      if (aiAgentAliasResponse.agentAliasSummaries) 
+                aiAgentAlias.push(
+                  ...(aiAgentAliasResponse.agentAliasSummaries.map(
+                    (alias) : AliasIds => ({
+                      agentAliasId: alias.agentAliasId || "",
+                      updateAt: alias.updatedAt ? alias.updatedAt.toISOString().replace(/\.\d{3}Z$/, "") : new Date().toISOString().replace(/\.\d{3}Z$/, "")
+                    })
+                  ) ?? [])
+                );
+              else{
+                console.warn(`No agentAliasSummaries found for agentId: ${agentId}`);
+              }
       nextTokenAlias = aiAgentAliasResponse.nextToken;
     } while (nextTokenAlias != undefined);
 
     // Chuyển đổi alias thành mảng string
-    const aiAgentAliasStrings: string[] = aiAgentAlias.filter(
-      (id): id is string => typeof id === "string"
-    );
-    console.log("AI Agent Alias:", aiAgentAliasStrings);
-
     const aiAgent: AiAgent = {
       id: agent.agentId || "",
-      aliasIds: aiAgentAliasStrings,
+      aliasIds: aiAgentAlias,
       name: agent.agentName || "",
       status: agent.agentStatus || "",
       description: agent.description || "",

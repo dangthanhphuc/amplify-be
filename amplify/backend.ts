@@ -2,13 +2,8 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { createRestApiStack } from './stacks/rest-api-stack';
-import { signUpPostMethodFnc } from './functions/auth/signup/resources';
-import { signInPostMethodFnc } from './functions/auth/signin/resources';
-import { confirmSignUpPostMethodFnc } from './functions/auth/confirmSignUp/resources';
-import { signInWithRedirectGoogleFnc } from './functions/auth/signInWithRedirectGoogle/resources';
-import { signInWithRedirectFacebookFnc } from './functions/auth/signInWithRedirectFacebook/resources';
+
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { getTokenByCodeFnc } from './functions/auth/token/resources';
 import { getAgentsFnc } from './functions/agents/get/resources';
 import { initialDataForAiAgentFnc } from './functions/agents/initial-data/resources';
 import { testFnc } from './functions/tests/resources';
@@ -16,11 +11,11 @@ import { chatWithAgentFnc } from './functions/agents/chatWithAgent/resources';
 import { storageForProject } from './storage/resource';
 import { getUserInfoFnc } from './functions/users/getUserInfo/resource';
 import { updateUserFnc } from './functions/users/updateUser/resource';
-import { postConfirmationFnc } from './functions/auth/postConfirmation/handler';
 import {CfnBucket} from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import { postConfirmationFnc } from './functions/auth/postConfirmation/resources';
 
 // Tạo __dirname cho ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -31,12 +26,6 @@ export const backend = defineBackend({
   auth,
   data,
   storageForProject,
-  signUpPostMethodFnc,
-  signInPostMethodFnc,
-  confirmSignUpPostMethodFnc,
-  signInWithRedirectFacebookFnc,
-  signInWithRedirectGoogleFnc,
-  getTokenByCodeFnc,
   getAgentsFnc,
   initialDataForAiAgentFnc,
   chatWithAgentFnc,
@@ -106,20 +95,20 @@ new BucketDeployment(backend.storageForProject.stack, "BucketDeployment", {
 
 
 
-backend.postConfirmationFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
-  effect: Effect.ALLOW,
-  actions: [
-    'rds-data:ExecuteStatement',
-    'rds-data:BatchExecuteStatement',
-    'rds-data:BeginTransaction',
-    'rds-data:CommitTransaction',
-    'rds-data:RollbackTransaction',
-    'secretsmanager:GetSecretValue',
-    'ssm:GetParameters',
-    'ssm:GetParameter',
-  ],
-  resources: ["*"]
-}))
+// backend.postConfirmationFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+//   effect: Effect.ALLOW,
+//   actions: [
+//     'rds-data:ExecuteStatement',
+//     'rds-data:BatchExecuteStatement',
+//     'rds-data:BeginTransaction',
+//     'rds-data:CommitTransaction',
+//     'rds-data:RollbackTransaction',
+//     'secretsmanager:GetSecretValue',
+//     'ssm:GetParameters',
+//     'ssm:GetParameter',
+//   ],
+//   resources: ["*"]
+// }))
 
 backend.initialDataForAiAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
@@ -175,23 +164,6 @@ backend.getAgentsFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
     'bedrock:ListAgents',
     'bedrock:ListAgentAliases',
     'bedrock:GetAgent',
-    'secretsmanager:GetSecretValue'
-  ],
-  resources: ["*"]
-}));
-
-backend.signUpPostMethodFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
-  effect: Effect.ALLOW,
-  actions: [
-    'cognito-idp:AdminCreateUser',
-    'cognito-idp:AdminSetUserPassword',
-    'cognito-idp:AdminAddUserToGroup',
-    'cognito-idp:AdminUpdateUserAttributes',
-    'rds-data:ExecuteStatement',
-    'rds-data:BatchExecuteStatement',
-    'rds-data:BeginTransaction',
-    'rds-data:CommitTransaction',
-    'rds-data:RollbackTransaction',
     'secretsmanager:GetSecretValue'
   ],
   resources: ["*"]

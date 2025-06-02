@@ -18,6 +18,7 @@ import { postConfirmationFnc } from './functions/auth/postConfirmation/resources
 import { updateUserAttributesFnc } from './functions/auth/updateUserAttributes/resources';
 import { onUploadS3Fnc } from './functions/s3/onUpload/resources';
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
+import { FunctionUrlAuthType, HttpMethod, InvokeMode } from 'aws-cdk-lib/aws-lambda';
 
 // Tạo __dirname cho ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -173,6 +174,16 @@ backend.chatWithAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   ],
   resources: ["*"]
 }));
+
+backend.chatWithAgentFnc.resources.lambda.addFunctionUrl({
+  cors: {
+    allowedOrigins: ['*'],
+    allowedMethods: [HttpMethod.ALL],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  },
+  authType: FunctionUrlAuthType.NONE,
+  invokeMode: InvokeMode.RESPONSE_STREAM
+});
 
 backend.testFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,

@@ -14,9 +14,9 @@ export const handler = awslambda.streamifyResponse(async (event, responseStream)
         "Transfer-Encoding": "chunked",
         Connection: "keep-alive",
         "Cache-Control": "no-cache",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
+        // "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        // "Access-Control-Allow-Origin": "*",
+        // "Access-Control-Allow-Headers": "Content-Type",
       }
     });
   
@@ -79,9 +79,9 @@ export const handler = awslambda.streamifyResponse(async (event, responseStream)
         statusCode: 500,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+          // "Access-Control-Allow-Origin": "*",
+          // "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+          //   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
             "Cache-Control": "no-cache"
         }
     });  

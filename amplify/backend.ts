@@ -19,6 +19,7 @@ import { updateUserAttributesFnc } from './functions/auth/updateUserAttributes/r
 import { onUploadS3Fnc } from './functions/s3/onUpload/resources';
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { FunctionUrlAuthType, HttpMethod, InvokeMode } from 'aws-cdk-lib/aws-lambda';
+import { Duration } from 'aws-cdk-lib';
 
 // Tạo __dirname cho ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -178,11 +179,25 @@ backend.chatWithAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
 backend.chatWithAgentFnc.resources.lambda.addFunctionUrl({
   cors: {
     allowedOrigins: ['*'],
-    allowedMethods: [HttpMethod.ALL],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedMethods: [HttpMethod.POST, HttpMethod.GET],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization', 
+      'X-Requested-With',
+      'Accept',
+      'Origin'
+    ],
+    exposedHeaders: [
+      'X-Request-ID',
+      'X-Response-Time', 
+      'X-Total-Tokens',
+      'X-Session-ID',
+    ],
+    allowCredentials: false, 
+    maxAge: Duration.seconds(86400)
   },
   authType: FunctionUrlAuthType.NONE,
-  invokeMode: InvokeMode.RESPONSE_STREAM
+  invokeMode: InvokeMode.RESPONSE_STREAM,
 });
 
 backend.testFnc.resources.lambda.addToRolePolicy(new PolicyStatement({

@@ -20,11 +20,10 @@ export function createRestApiStack(backend: any) {
 
     // create a new API stack
     const restApiStack = backend.createStack("rest-api-stack");
-    const environment = process.env.ENVIRONMENT ?? "sandbox";
 
   // create a new REST API
   const restAPI = new RestApi(restApiStack, "RestApi", {
-    restApiName: `AiAgentRestApi-${environment}`,
+    restApiName: `AiAgentRestApi`,
     deploy: true,
     deployOptions: {
       stageName: "dev",

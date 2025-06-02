@@ -1,5 +1,6 @@
 import { defineAuth, secret } from '@aws-amplify/backend';
 import { postConfirmationFnc } from '../functions/auth/postConfirmation/resources';
+import { customMessageFnc } from '../functions/auth/customMessage/resources';
 
 export const auth = defineAuth({
   loginWith: {
@@ -61,6 +62,7 @@ export const auth = defineAuth({
   groups: ["USERS", "EXPERTS", "ADMINS"],
   triggers: { 
     postConfirmation: postConfirmationFnc,
+    // customMessage: customMessageFnc
   },
   access: (allow) => [
     allow.resource(postConfirmationFnc).to(["addUserToGroup"])

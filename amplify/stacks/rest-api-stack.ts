@@ -20,10 +20,11 @@ export function createRestApiStack(backend: any) {
 
     // create a new API stack
     const restApiStack = backend.createStack("rest-api-stack");
+    const environment = process.env.ENVIRONMENT ?? "sandbox";
 
   // create a new REST API
   const restAPI = new RestApi(restApiStack, "RestApi", {
-    restApiName: "AiAgentRestApi",
+    restApiName: `AiAgentRestApi-${environment}`,
     deploy: true,
     deployOptions: {
       stageName: "dev",
@@ -37,9 +38,9 @@ export function createRestApiStack(backend: any) {
   });
 
   // create a new Cognito User Pools authorizer
-  const cognitoAuth = new CognitoUserPoolsAuthorizer(restApiStack, "CognitoAuth", {
-    cognitoUserPools: [backend.auth.resources.userPool],
-  });
+  // const cognitoAuth = new CognitoUserPoolsAuthorizer(restApiStack, "CognitoAuth", {
+  //   cognitoUserPools: [backend.auth.resources.userPool],
+  // });
 
   const lambdaForGetAgents = createLambdaIntegrationResponse(
     backend.getAgentsFnc.resources.lambda
@@ -56,16 +57,15 @@ export function createRestApiStack(backend: any) {
   const lambdaForGetUserInfo = createLambdaIntegrationResponse(
     backend.getUserInfoFnc.resources.lambda
   );
-
-  const lambdaForUpdateUser = createLambdaIntegrationResponse(
-    backend.updateUserFnc.resources.lambda
+  const lambdaForUpdateUserAttributes = createLambdaIntegrationResponse(
+    backend.updateUserAttributesFnc.resources.lambda
   );
 
-  const methodOptionsForUsers : MethodOptions = {
-    authorizationType: AuthorizationType.COGNITO,
-    authorizer: cognitoAuth,
-    authorizationScopes: ["USERS"]
-  };
+  // const methodOptionsForUsers : MethodOptions = {
+  //   authorizationType: AuthorizationType.COGNITO,
+  //   authorizer: cognitoAuth,
+  //   authorizationScopes: ["USERS"]
+  // };
 
   // const methodOptionsForExperts : MethodOptions = {
   //   authorizationType: AuthorizationType.COGNITO,
@@ -92,8 +92,7 @@ export function createRestApiStack(backend: any) {
   // User resource
   const userResource = restAPI.root.addResource("users");
   userResource.addMethod("GET", lambdaForGetUserInfo);
-  userResource.addMethod("PUT", lambdaForUpdateUser, methodOptionsForUsers);
-
+  userResource.addMethod("PUT", lambdaForUpdateUserAttributes);
 
   // Add source for db
   const dataForAgents = restAPI.root.addResource("dataForAgents");

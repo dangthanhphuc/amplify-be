@@ -10,12 +10,14 @@ import { testFnc } from './functions/tests/resources';
 import { chatWithAgentFnc } from './functions/agents/chatWithAgent/resources';
 import { storageForProject } from './storage/resource';
 import { getUserInfoFnc } from './functions/users/getUserInfo/resource';
-import { updateUserFnc } from './functions/users/updateUser/resource';
-import {CfnBucket} from 'aws-cdk-lib/aws-s3';
+import {CfnBucket, EventType} from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { postConfirmationFnc } from './functions/auth/postConfirmation/resources';
+import { updateUserAttributesFnc } from './functions/auth/updateUserAttributes/resources';
+import { onUploadS3Fnc } from './functions/s3/onUpload/resources';
+import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
 
 // Tạo __dirname cho ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -26,11 +28,12 @@ export const backend = defineBackend({
   auth,
   data,
   storageForProject,
+  onUploadS3Fnc,
   getAgentsFnc,
   initialDataForAiAgentFnc,
   chatWithAgentFnc,
   getUserInfoFnc,
-  updateUserFnc,
+  updateUserAttributesFnc,
   postConfirmationFnc,
   testFnc
 });
@@ -71,44 +74,33 @@ cfnBucket.accelerateConfiguration = {
   accelerationStatus: "Enabled" // 'Suspended' if you want to disable transfer acceleration
 }
 
+// Initial file for s3 
 new BucketDeployment(backend.storageForProject.stack, "BucketDeployment", {
   sources: [Source.asset(path.join(__dirname, 'storage/public-images'))],
   destinationBucket: s3Bucket,
   destinationKeyPrefix: 'public-images/', // optional prefix in the bucket
 });
 
-// const accountId = Stack.of(backend.storageForProject.resources.bucket).account;
+backend.storageForProject.resources.bucket.addEventNotification(
+  EventType.OBJECT_CREATED,
+  new LambdaDestination(backend.onUploadS3Fnc.resources.lambda),
+  {
+    prefix: 'profile-pictures/',  // prefix for profile pictures
+  }
+)
 
-// backend.storageForProject.resources.bucket.addToResourcePolicy(new PolicyStatement({
-//   effect: Effect.ALLOW,
-//   actions: [
-//     's3:GetObject',
-//     's3:PutObject',
-//     's3:DeleteObject',
-//     's3:ListBucket',
-//   ],
-//   resources: [`*`],
-//   principals: [
-//     new ArnPrincipal(`arn:aws:iam::${accountId}:root`)
-//   ]
-// }));
+backend.onUploadS3Fnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    's3:GetObject',
+    's3:PutObject',
+    's3:DeleteObject',
+    's3:ListBucket',
+    's3:GetBucketLocation'
+  ],
+  resources: [`*`]
+}));
 
-
-
-// backend.postConfirmationFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
-//   effect: Effect.ALLOW,
-//   actions: [
-//     'rds-data:ExecuteStatement',
-//     'rds-data:BatchExecuteStatement',
-//     'rds-data:BeginTransaction',
-//     'rds-data:CommitTransaction',
-//     'rds-data:RollbackTransaction',
-//     'secretsmanager:GetSecretValue',
-//     'ssm:GetParameters',
-//     'ssm:GetParameter',
-//   ],
-//   resources: ["*"]
-// }))
 
 backend.initialDataForAiAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
@@ -140,15 +132,10 @@ backend.getUserInfoFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   resources: ["*"]
 }));
 
-backend.updateUserFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+backend.updateUserAttributesFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
   actions: [
-    'rds-data:ExecuteStatement',
-    'rds-data:BatchExecuteStatement',
-    'rds-data:BeginTransaction',
-    'rds-data:CommitTransaction',
-    'rds-data:RollbackTransaction',
-    'secretsmanager:GetSecretValue'
+    'cognito-idp:AdminUpdateUserAttributes'
   ],
   resources: ["*"]
 }));

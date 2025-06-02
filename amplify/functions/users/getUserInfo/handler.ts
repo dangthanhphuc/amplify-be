@@ -2,7 +2,6 @@ import type { APIGatewayProxyHandler } from "aws-lambda";
 import { getUserInfo } from "../../../services/rdsService";
 import { getRdsClient } from "../../../utils/clients";
 import { env } from "$amplify/env/getUserInfoFnc";
-import { ResponseObject } from "../../../utils/responseObject";
 
 
 export const handler : APIGatewayProxyHandler= async (event) => {

@@ -2,6 +2,10 @@ import { a, defineData, type ClientSchema } from "@aws-amplify/backend";
 import { schema as generatedSqlSchema } from "./schema.sql";
 import { postConfirmationFnc } from "../functions/auth/postConfirmation/resources";
 
+import { updateUserAttributesFnc } from "../functions/auth/updateUserAttributes/resources";
+import { generateClient } from "aws-amplify/data";
+import { onUploadS3Fnc } from "../functions/s3/onUpload/resources";
+
 const sqlSchema = generatedSqlSchema
   .renameModels(() => [
     ["agent_categories", "AgentCategories"],
@@ -55,7 +59,11 @@ const sqlSchema = generatedSqlSchema
   //     roles: a.belongsTo("Roles", "role_id"),
   //     created_agents: a.hasMany("AiAgents", "creator_id"),
   //   }),])
-  .authorization((allow) => [allow.resource(postConfirmationFnc)]); // Cấp quyền truy cập cho lambda để thao tác trên lược đồ 
+  .authorization((allow) => [
+    allow.resource(postConfirmationFnc),
+    allow.resource(updateUserAttributesFnc),
+    allow.resource(onUploadS3Fnc),
+  ]); // Cấp quyền truy cập cho lambda để thao tác trên lược đồ 
 
 // const schema = a.schema({
 //   Todo: a.model({
@@ -70,7 +78,16 @@ export type Schema = ClientSchema<typeof sqlSchema>;
 
 export const data = defineData({
   schema: sqlSchema,
+  logging: true
   // authorizationModes:{
   //   defaultAuthorizationMode: "userPool"
   // }
 });
+
+
+const amplifyClient = generateClient<Schema>();
+//  const relo =    await amplifyClient.models.AiAgents.update({
+//   id: "1",
+//   profile_image: "new-image-key.jpg"
+//  });
+    

@@ -9,3 +9,10 @@ export interface User {
     description: string;
     roleId: number;
 }
+
+export interface UpdateUserAttribute {
+    id: string;
+    name?: string;
+    displayName?: string;
+    description?: string;
+}

@@ -1,5 +1,5 @@
 import {  ExecuteStatementCommand, RDSDataClient } from "@aws-sdk/client-rds-data";
-import { User } from "../interfaces/user";
+import { UpdateUserAttribute, User } from "../interfaces/user";
 import bcrypt from "bcryptjs";
 import { getSecret } from "./secretManagerService";
 import { getSecretManagerClient } from "../utils/clients";
@@ -132,4 +132,25 @@ export async function getAllAiAgents(rdsClient: RDSDataClient, resourceArn: stri
         console.error("Error fetching AI agents:", error);
         throw error;
     }
+}
+
+
+export async function updateUserToRDS(
+    rdsClient : RDSDataClient,
+    resourceArn: string,
+    secretArn: string,
+    rdsDatabase: string,
+    updateUserAttribute : UpdateUserAttribute
+) {
+
+
+
+    // const result = await rdsClient.send(new ExecuteStatementCommand({
+    //     resourceArn: resourceArn,
+    //     secretArn: secretArn,
+    //     database: rdsDatabase,
+    //     sql: sql,
+    //     parameters: parameters
+    // }));
+    
 }

@@ -152,6 +152,17 @@ backend.onUploadS3Fnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   resources: [`*`]
 }));
 
+backend.createAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    'rds-data:ExecuteStatement',
+    'rds-data:BatchExecuteStatement',
+    'rds-data:BeginTransaction',
+    'rds-data:CommitTransaction',
+    'secretsmanager:GetSecretValue'
+  ],
+  resources: ["*"]
+}))
 
 backend.initialDataForAiAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,

@@ -22,7 +22,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
         const amplifyClient = await getAmplifyClient(env);
 
         // Delete the agent category
-        await amplifyClient.models.AgentCategories.delete({ id: categoryId });
+        const result = await amplifyClient.models.AgentCategories.delete({ id: categoryId });
+        console.log("Delete result:", result);
 
         return {
             statusCode: 200,

@@ -128,7 +128,11 @@ export type Schema = ClientSchema<typeof sqlSchema>;
 
 export const data = defineData({
   schema: sqlSchema, 
-  logging: true
+  logging: {
+    excludeVerboseContent: false,
+    fieldLogLevel: "all",
+    retention: "1 week" 
+  }
   // authorizationModes:{
   //   defaultAuthorizationMode: "userPool"
   // }

@@ -6,13 +6,13 @@ import { randomUUID } from "crypto";
 export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
     const requestBody = JSON.parse(event.body || '{}');
     console.log("Received request body:", JSON.stringify(requestBody, null, 2));
-    const { name, description } = requestBody;
+    const { name, severity } = requestBody;
     
-    if (!name) {
+    if (!name || !severity) {
         return {
             statusCode: 400,
             body: JSON.stringify({
-                message: "Missing required field: name",
+                message: "Missing required field: name, severity",
             }),
         };
     }
@@ -23,8 +23,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
         const result = await amplifyClient.models.ReportCategories.create({
             id: randomUUID().toString(),
             name: name,
-            description: description || "",
-            created_at: new Date().toISOString().replace(/\.\d{3}Z$/, ""),
+            severity: severity,
         });
         
         console.log("Report Category result:", JSON.stringify(result, null, 2));

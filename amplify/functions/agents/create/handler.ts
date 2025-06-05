@@ -72,8 +72,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   )
 `;
 
-
-
   try {
     const secretManagerClient = getSecretManagerClient();
     const secretValue = await getSecret(

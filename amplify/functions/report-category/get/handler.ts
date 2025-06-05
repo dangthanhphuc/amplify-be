@@ -3,13 +3,13 @@ import { getAmplifyClient } from "../../../utils/clientUtil";
 import { env } from "$amplify/env/getReportCategoryFnc";
 
 export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
-    const { id } = event.pathParameters || {};
+    const { categoryId } = event.pathParameters || {};
     
-    if (!id) {
+    if (!categoryId) {
         return {
             statusCode: 400,
             body: JSON.stringify({
-                message: "Missing required parameter: id",
+                message: "Missing required parameter: categoryId",
             }),
         };
     }
@@ -17,7 +17,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
     const amplifyClient = await getAmplifyClient(env);
 
     try {
-        const result = await amplifyClient.models.ReportCategories.get({ id });
+        const result = await amplifyClient.models.ReportCategories.get({ id: categoryId });
         
         if (!result.data) {
             return {

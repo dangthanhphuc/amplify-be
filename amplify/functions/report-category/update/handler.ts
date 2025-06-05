@@ -3,21 +3,21 @@ import { getAmplifyClient } from "../../../utils/clientUtil";
 import { env } from "$amplify/env/updateReportCategoryFnc";
 
 export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
-    const { id } = event.pathParameters || {};
+    const { categoryId } = event.pathParameters || {};
     const requestBody = JSON.parse(event.body || '{}');
     
-    if (!id) {
+    if (!categoryId) {
         return {
             statusCode: 400,
             body: JSON.stringify({
-                message: "Missing required parameter: id",
+                message: "Missing required parameter: categoryId",
             }),
         };
     }
 
-    const { name, description } = requestBody;
+    const { name, severity } = requestBody;
     
-    if (!name && !description) {
+    if (!name && !severity) {
         return {
             statusCode: 400,
             body: JSON.stringify({
@@ -30,12 +30,11 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
 
     try {
         const updateData: any = {
-            id: id,
-            updated_at: new Date().toISOString().replace(/\.\d{3}Z$/, ""),
+            id: categoryId
         };
 
         if (name) updateData.name = name;
-        if (description !== undefined) updateData.description = description;
+        if (severity) updateData.severity = severity;
 
         const result = await amplifyClient.models.ReportCategories.update(updateData);
 
@@ -58,3 +57,4 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
         };
     }
 };
+

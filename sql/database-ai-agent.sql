@@ -16,7 +16,7 @@ CREATE TABLE agent_categories (
 CREATE TABLE report_categories (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
-    reversity INT
+    severity INT
 );
 
 -- 2. Bảng users (phụ thuộc roles)

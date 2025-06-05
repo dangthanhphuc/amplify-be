@@ -5,6 +5,26 @@ import { postConfirmationFnc } from "../functions/auth/postConfirmation/resource
 import { updateUserAttributesFnc } from "../functions/auth/updateUserAttributes/resources";
 import { generateClient } from "aws-amplify/data";
 import { onUploadS3Fnc } from "../functions/s3/onUpload/resources";
+import { getUserInfoFnc } from "../functions/users/getUserInfo/resource";
+import { listAiReviewsFnc } from "../functions/ai-reviews/list/resources";
+import { createAiReviewFnc } from "../functions/ai-reviews/create/resources";
+import { updateAiReviewFnc } from "../functions/ai-reviews/update/resources";
+import { deleteAiReviewFnc } from "../functions/ai-reviews/delete/resources";
+import { listUserLikesFnc } from "../functions/user-like/list/resources";
+import { updateUserLikeFnc } from "../functions/user-like/update/resources";
+import { createUserLikeFnc } from "../functions/user-like/create/resources";
+import { deleteUserLikeFnc } from "../functions/user-like/delete/resources";
+import { getAiReviewFnc } from "../functions/ai-reviews/get/resources";
+import { getReportCategoryFnc } from "../functions/report-category/get/resources";
+import { listReportCategoriesFnc } from "../functions/report-category/list/resources";
+import { createReportCategoryFnc } from "../functions/report-category/create/resources";
+import { updateReportCategoryFnc } from "../functions/report-category/update/resources";
+import { deleteReportCategoryFnc } from "../functions/report-category/delete/resources";
+import { getAgentCategoryFnc } from "../functions/agent-category/get/resources";
+import { listAgentCategoriesFnc } from "../functions/agent-category/list/resources";
+import { createAgentCategoryFnc } from "../functions/agent-category/create/resources";
+import { updateAgentCategoryFnc } from "../functions/agent-category/update/resources";
+import { deleteAgentCategoryFnc } from "../functions/agent-category/delete/resources";
 
 const sqlSchema = generatedSqlSchema
   .renameModels(() => [
@@ -63,6 +83,33 @@ const sqlSchema = generatedSqlSchema
     allow.resource(postConfirmationFnc),
     allow.resource(updateUserAttributesFnc),
     allow.resource(onUploadS3Fnc),
+    allow.resource(getUserInfoFnc),
+
+    allow.resource(listAiReviewsFnc),
+    allow.resource(getAiReviewFnc),
+    allow.resource(createAiReviewFnc),
+    allow.resource(updateAiReviewFnc),
+    allow.resource(deleteAiReviewFnc),
+
+    // allow.resource(getUserLikeFnc),
+    allow.resource(listUserLikesFnc),
+    allow.resource(createUserLikeFnc),
+    allow.resource(updateUserLikeFnc),
+    allow.resource(deleteUserLikeFnc),
+
+    // Report Category
+    allow.resource(getReportCategoryFnc),
+    allow.resource(listReportCategoriesFnc),
+    allow.resource(createReportCategoryFnc),
+    allow.resource(updateReportCategoryFnc),
+    allow.resource(deleteReportCategoryFnc),
+
+    // Agent Categoy
+    allow.resource(getAgentCategoryFnc),
+    allow.resource(listAgentCategoriesFnc),
+    allow.resource(createAgentCategoryFnc),
+    allow.resource(updateAgentCategoryFnc),
+    allow.resource(deleteAgentCategoryFnc),
   ]); // Cấp quyền truy cập cho lambda để thao tác trên lược đồ 
 
 // const schema = a.schema({
@@ -77,7 +124,7 @@ const sqlSchema = generatedSqlSchema
 export type Schema = ClientSchema<typeof sqlSchema>;
 
 export const data = defineData({
-  schema: sqlSchema,
+  schema: sqlSchema, 
   logging: true
   // authorizationModes:{
   //   defaultAuthorizationMode: "userPool"
@@ -85,9 +132,8 @@ export const data = defineData({
 });
 
 
-const amplifyClient = generateClient<Schema>();
-//  const relo =    await amplifyClient.models.AiAgents.update({
-//   id: "1",
-//   profile_image: "new-image-key.jpg"
-//  });
-    
+// const amplifyClient = generateClient<Schema>();
+//     const userLikeExists = await amplifyClient.models.UserLikes.get({
+//       user_id: "exampleUserId",
+//       ai_agent_id: "exampleAiAgentId",
+//     })

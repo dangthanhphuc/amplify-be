@@ -6,7 +6,6 @@ import { createRestApiStack } from './stacks/rest-api-stack';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { getAgentsFnc } from './functions/agents/get/resources';
 import { initialDataForAiAgentFnc } from './functions/agents/initial-data/resources';
-import { testFnc } from './functions/tests/resources';
 import { chatWithAgentFnc } from './functions/agents/chatWithAgent/resources';
 import { storageForProject } from './storage/resource';
 import { getUserInfoFnc } from './functions/users/getUserInfo/resource';
@@ -17,9 +16,29 @@ import { fileURLToPath } from 'url';
 import { postConfirmationFnc } from './functions/auth/postConfirmation/resources';
 import { updateUserAttributesFnc } from './functions/auth/updateUserAttributes/resources';
 import { onUploadS3Fnc } from './functions/s3/onUpload/resources';
+import { createAiReviewFnc } from './functions/ai-reviews/create/resources';
+import { getAiReviewFnc } from './functions/ai-reviews/get/resources';
+import { listAiReviewsFnc } from './functions/ai-reviews/list/resources';
+import { updateAiReviewFnc } from './functions/ai-reviews/update/resources';
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { FunctionUrlAuthType, HttpMethod, InvokeMode } from 'aws-cdk-lib/aws-lambda';
 import { Duration } from 'aws-cdk-lib';
+import { deleteAiReviewFnc } from './functions/ai-reviews/delete/resources';
+import { createUserLikeFnc } from './functions/user-like/create/resources';
+import { deleteUserLikeFnc } from './functions/user-like/delete/resources';
+import { updateUserLikeFnc } from './functions/user-like/update/resources';
+import { listUserLikesFnc } from './functions/user-like/list/resources';
+import { getReportCategoryFnc } from './functions/report-category/get/resources';
+import { listReportCategoriesFnc } from './functions/report-category/list/resources';
+import { createReportCategoryFnc } from './functions/report-category/create/resources';
+import { updateReportCategoryFnc } from './functions/report-category/update/resources';
+import { deleteReportCategoryFnc } from './functions/report-category/delete/resources';
+import { getAgentCategoryFnc } from './functions/agent-category/get/resources';
+import { createAgentCategoryFnc } from './functions/agent-category/create/resources';
+import { deleteAgentCategoryFnc } from './functions/agent-category/delete/resources';
+import { listAgentCategoriesFnc } from './functions/agent-category/list/resources';
+import { updateAgentCategoryFnc } from './functions/agent-category/update/resources';
+import { testFnc } from './functions/tests/resources';
 
 // Tạo __dirname cho ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -37,6 +56,33 @@ export const backend = defineBackend({
   getUserInfoFnc,
   updateUserAttributesFnc,
   postConfirmationFnc,
+
+  createAiReviewFnc,
+  getAiReviewFnc,
+  listAiReviewsFnc,
+  updateAiReviewFnc,
+  deleteAiReviewFnc,
+
+  createUserLikeFnc,
+  listUserLikesFnc,
+  // getUserLikeFnc,
+  updateUserLikeFnc,
+  deleteUserLikeFnc,
+
+  // Report Category
+  getReportCategoryFnc,
+  listReportCategoriesFnc,
+  createReportCategoryFnc,
+  updateReportCategoryFnc,
+  deleteReportCategoryFnc,
+
+  // Agent Categories
+  getAgentCategoryFnc,
+  listAgentCategoriesFnc,
+  createAgentCategoryFnc,
+  updateAgentCategoryFnc,
+  deleteAgentCategoryFnc,
+
   testFnc
 });
 

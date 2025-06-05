@@ -8,10 +8,10 @@ let isConfigured = false;
 
 export async function getAmplifyClient(env : any) {
 
-    console.info("Fetching Amplify Data Client configuration...");
-    console.info("Environment AMPLIFY_DATA_DEFAULT_NAME:", env.AMPLIFY_DATA_DEFAULT_NAME);
-    console.info("Cached Client:", cachedClient);
-    console.info("Is Configured:", isConfigured);
+    // console.info("Fetching Amplify Data Client configuration...");
+    // console.info("Environment AMPLIFY_DATA_DEFAULT_NAME:", env.AMPLIFY_DATA_DEFAULT_NAME);
+    // console.info("Cached Client:", cachedClient);
+    // console.info("Is Configured:", isConfigured);
 
     if( cachedClient && isConfigured) {
         return cachedClient;

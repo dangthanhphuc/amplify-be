@@ -1,4 +1,3 @@
-
 import {
   AuthorizationType,
   CognitoUserPoolsAuthorizer,
@@ -56,6 +55,67 @@ export function createRestApiStack(backend: any) {
     backend.updateUserAttributesFnc.resources.lambda
   );
 
+  const lambdaForCreateAiReview = createLambdaIntegrationResponse(
+    backend.createAiReviewFnc.resources.lambda
+  );
+  const lambdaForGetAiReview = createLambdaIntegrationResponse(
+    backend.getAiReviewFnc.resources.lambda
+  );
+  const lambdaForListAiReviews = createLambdaIntegrationResponse(
+    backend.listAiReviewsFnc.resources.lambda
+  );
+  const lambdaForUpdateAiReview = createLambdaIntegrationResponse(
+    backend.updateAiReviewFnc.resources.lambda
+  );
+  const lambdaForDeleteAiReview = createLambdaIntegrationResponse(
+    backend.deleteAiReviewFnc.resources.lambda
+  );
+
+  const lambdaForCreateUserLike = createLambdaIntegrationResponse(
+    backend.createUserLikeFnc.resources.lambda
+  );
+  const lambdaForListUserLikes = createLambdaIntegrationResponse(
+    backend.listUserLikesFnc.resources.lambda
+  );
+  const lambdaForUpdateUserLike = createLambdaIntegrationResponse(
+    backend.updateUserLikeFnc.resources.lambda
+  );
+  const lambdaForDeleteUserLike = createLambdaIntegrationResponse(
+    backend.deleteUserLikeFnc.resources.lambda
+  );
+
+   const lambdaForCreateReportCategory = createLambdaIntegrationResponse(
+    backend.createReportCategoryFnc.resources.lambda
+  );
+  const lambdaForGetReportCategory = createLambdaIntegrationResponse(
+    backend.getReportCategoryFnc.resources.lambda
+  );
+  const lambdaForListReportCategory = createLambdaIntegrationResponse(
+    backend.listReportCategoriesFnc.resources.lambda
+  );
+  const lambdaForUpdateReportCategory = createLambdaIntegrationResponse(
+    backend.updateReportCategoryFnc.resources.lambda
+  );
+  const lambdaForDeleteReportCategory = createLambdaIntegrationResponse(
+    backend.deleteReportCategoryFnc.resources.lambda
+  );
+
+  const lambdaForCreateAgentCategory = createLambdaIntegrationResponse(
+    backend.createAgentCategoryFnc.resources.lambda
+  );
+  const lambdaForGetAgentCategory = createLambdaIntegrationResponse(
+    backend.getAgentCategoryFnc.resources.lambda
+  );
+  const lambdaForListAgentCategories = createLambdaIntegrationResponse(
+    backend.listAgentCategoriesFnc.resources.lambda
+  );
+  const lambdaForUpdateAgentCategory = createLambdaIntegrationResponse(
+    backend.updateAgentCategoryFnc.resources.lambda
+  );
+  const lambdaForDeleteAgentCategory = createLambdaIntegrationResponse(
+    backend.deleteAgentCategoryFnc.resources.lambda
+  );
+
   // const methodOptionsForUsers : MethodOptions = {
   //   authorizationType: AuthorizationType.COGNITO,
   //   authorizer: cognitoAuth,
@@ -85,12 +145,50 @@ export function createRestApiStack(backend: any) {
 
   // User resource
   const userResource = restAPI.root.addResource("users");
-  userResource.addMethod("GET", lambdaForGetUserInfo);
+  const userByIdResource = userResource.addResource("{userId}");
+  userByIdResource.addMethod("GET", lambdaForGetUserInfo);
   userResource.addMethod("PUT", lambdaForUpdateUserAttributes);
 
   // Add source for db
   const dataForAgents = restAPI.root.addResource("dataForAgents");
   dataForAgents.addMethod("GET", lambdaFordDataForAgents)
+
+  // AI Reviews resource
+  const aiReviewsResource = restAPI.root.addResource("ai-reviews");
+  aiReviewsResource.addMethod("POST", lambdaForCreateAiReview);
+  aiReviewsResource.addMethod("GET", lambdaForListAiReviews);
+  
+  const aiReviewByIdResource = aiReviewsResource.addResource("{reviewId}");
+  aiReviewByIdResource.addMethod("GET", lambdaForGetAiReview);
+  aiReviewByIdResource.addMethod("PUT", lambdaForUpdateAiReview);
+  aiReviewByIdResource.addMethod("DELETE", lambdaForDeleteAiReview);
+
+  // User Likes resource
+  const userLikesResource = restAPI.root.addResource("user-likes");
+  userLikesResource.addMethod("POST", lambdaForCreateUserLike);
+  userLikesResource.addMethod("GET", lambdaForListUserLikes);
+  userLikesResource.addMethod("PUT", lambdaForUpdateUserLike);
+  userLikesResource.addMethod("DELETE", lambdaForDeleteUserLike);
+
+  // Report Categories resource
+  const reportCategoriesResource = restAPI.root.addResource("report-categories");
+  reportCategoriesResource.addMethod("POST", lambdaForCreateReportCategory);
+  reportCategoriesResource.addMethod("GET", lambdaForListReportCategory);
+
+  const reportCategoryByIdResource = reportCategoriesResource.addResource("{categoryId}");
+  reportCategoryByIdResource.addMethod("GET", lambdaForGetReportCategory);
+  reportCategoryByIdResource.addMethod("PUT", lambdaForUpdateReportCategory);
+  reportCategoryByIdResource.addMethod("DELETE", lambdaForDeleteReportCategory);
+
+  // Agent Categories resource
+  const agentCategoriesResource = restAPI.root.addResource("agent-categories");
+  agentCategoriesResource.addMethod("POST", lambdaForCreateAgentCategory);
+  agentCategoriesResource.addMethod("GET", lambdaForListAgentCategories);
+  const agentCategoryByIdResource = agentCategoriesResource.addResource("{categoryId}");
+  agentCategoryByIdResource.addMethod("GET", lambdaForGetAgentCategory);
+  agentCategoryByIdResource.addMethod("PUT", lambdaForUpdateAgentCategory);
+  agentCategoryByIdResource.addMethod("DELETE", lambdaForDeleteAgentCategory);
+
   // Test resource
   const testResource = restAPI.root.addResource("test");
   const testFnc = new LambdaIntegration(backend.testFnc.resources.lambda);

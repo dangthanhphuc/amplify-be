@@ -55,13 +55,6 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "report_categories": a.model({
-        id: a.integer().required(),
-        name: a.string().required(),
-        reversity: a.integer()
-    }).identifier([
-        "id"
-    ]),
     "users": a.model({
         id: a.string().required(),
         email: a.string(),
@@ -92,7 +85,8 @@ export const schema = configure({
         model: a.string(),
         capabilities: a.json(),
         alias_ids: a.json(),
-        cost: a.float()
+        cost: a.float(),
+        suggested_questions: a.json()
     }).identifier([
         "id"
     ]),
@@ -103,26 +97,6 @@ export const schema = configure({
         "ai_agent_id",
         "agent_category_id"
     ]),
-    "user_likes": a.model({
-        user_id: a.string().required(),
-        ai_agent_id: a.string().required(),
-        liked: a.integer(),
-        create_at: a.datetime()
-    }).identifier([
-        "user_id",
-        "ai_agent_id"
-    ]),
-    "ai_reviews": a.model({
-        id: a.integer().required(),
-        description: a.string(),
-        rating: a.integer(),
-        create_at: a.datetime(),
-        ai_agent_id: a.string(),
-        reporter_id: a.string(),
-        report_categories_id: a.integer()
-    }).identifier([
-        "id"
-    ]),
     "chats": a.model({
         id: a.integer().required(),
         raw_content: a.string(),
@@ -131,5 +105,33 @@ export const schema = configure({
         ai_agent_id: a.string()
     }).identifier([
         "id"
+    ]),
+    "report_categories": a.model({
+        id: a.integer().required(),
+        name: a.string().required(),
+        severity: a.integer()
+    }).identifier([
+        "id"
+    ]),
+    "ai_reviews": a.model({
+        id: a.string().required(),
+        description: a.string(),
+        rating: a.integer(),
+        created_at: a.datetime(),
+        ai_agent_id: a.string(),
+        reporter_id: a.string(),
+        report_categories_id: a.integer()
+    }).identifier([
+        "id"
+    ]),
+    "user_likes": a.model({
+        user_id: a.string().required(),
+        ai_agent_id: a.string().required(),
+        liked: a.integer(),
+        create_at: a.datetime(),
+        updated_at: a.datetime()
+    }).identifier([
+        "user_id",
+        "ai_agent_id"
     ])
 });

@@ -6,7 +6,7 @@ import { randomUUID } from "crypto";
 export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
     const requestBody = JSON.parse(event.body || '{}');
     console.log("Received request body:", JSON.stringify(requestBody, null, 2));
-    const { name, description } = requestBody;
+    const { name } = requestBody;
     
     if (!name) {
         return {
@@ -22,9 +22,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
     try {
         const result = await amplifyClient.models.AgentCategories.create({
             id: randomUUID().toString(),
-            name: name,
-            description: description || "",
-            created_at: new Date().toISOString(),
+            name: name
         });
         
         console.log("Agent Category result:", JSON.stringify(result, null, 2));

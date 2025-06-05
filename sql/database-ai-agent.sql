@@ -4,17 +4,17 @@ USE ai_agent_system;
 
 -- 1. Bảng không phụ thuộc
 CREATE TABLE roles (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id VARCHAR(255) PRIMARY KEY,
     name CHAR(50) NOT NULL
 );
 
 CREATE TABLE agent_categories (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE report_categories (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     severity INT
 );
@@ -28,7 +28,7 @@ CREATE TABLE users (
     display_name VARCHAR(100),
     profile_image VARCHAR(255),
     description TEXT,
-    role_id INT,
+    role_id VARCHAR(255),
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
@@ -59,7 +59,7 @@ CREATE TABLE ai_agents (
 -- 4. Bảng liên kết nhiều-nhiều giữa ai_agents và agent_categories
 CREATE TABLE ai_categories (
     ai_agent_id VARCHAR(255),
-    agent_category_id INT,
+    agent_category_id VARCHAR(255),
     PRIMARY KEY (ai_agent_id, agent_category_id),
     FOREIGN KEY (ai_agent_id) REFERENCES ai_agents(id),
     FOREIGN KEY (agent_category_id) REFERENCES agent_categories(id)
@@ -77,20 +77,20 @@ CREATE TABLE user_likes (
 );
 
 CREATE TABLE ai_reviews (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id VARCHAR(255) PRIMARY KEY,
     description TEXT,
     rating INT,
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ai_agent_id VARCHAR(255),
     reporter_id VARCHAR(255),
-    report_categories_id INT,
+    report_categories_id VARCHAR(255),
     FOREIGN KEY (ai_agent_id) REFERENCES ai_agents(id),
     FOREIGN KEY (reporter_id) REFERENCES users(id),
     FOREIGN KEY (report_categories_id) REFERENCES report_categories(id)
 );
 
 CREATE TABLE chats (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id VARCHAR(255) PRIMARY KEY,
     raw_content NVARCHAR(255),
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     user_id VARCHAR(255),

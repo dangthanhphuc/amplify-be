@@ -3,14 +3,14 @@ import { getAmplifyClient } from "../../../utils/clientUtil";
 import { env } from "$amplify/env/updateAgentCategoryFnc";
 
 export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
-    const { id } = event.pathParameters || {};
+    const { categoryId } = event.pathParameters || {};
     const requestBody = JSON.parse(event.body || '{}');
     
-    if (!id) {
+    if (!categoryId) {
         return {
             statusCode: 400,
             body: JSON.stringify({
-                message: "Missing required parameter: id",
+                message: "Missing required parameter: categoryId",
             }),
         };
     }
@@ -30,7 +30,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
 
     try {
         // First check if the category exists
-        const existingCategory = await amplifyClient.models.AgentCategories.get({ id });
+        const existingCategory = await amplifyClient.models.AgentCategories.get({ id: categoryId });
 
         if (!existingCategory.data) {
             return {
@@ -42,12 +42,10 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
         }
 
         const updateData: any = {
-            id: id,
-            updated_at: new Date().toISOString(),
+            id: categoryId,
         };
 
         if (name) updateData.name = name;
-        if (description !== undefined) updateData.description = description;
 
         const result = await amplifyClient.models.AgentCategories.update(updateData);
 

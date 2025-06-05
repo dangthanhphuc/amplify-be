@@ -39,6 +39,7 @@ import { deleteAgentCategoryFnc } from './functions/agent-category/delete/resour
 import { listAgentCategoriesFnc } from './functions/agent-category/list/resources';
 import { updateAgentCategoryFnc } from './functions/agent-category/update/resources';
 import { testFnc } from './functions/tests/resources';
+import { createAgentFnc } from './functions/agents/create/resources';
 
 // Tạo __dirname cho ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -56,6 +57,8 @@ export const backend = defineBackend({
   getUserInfoFnc,
   updateUserAttributesFnc,
   postConfirmationFnc,
+
+  createAgentFnc,
 
   createAiReviewFnc,
   getAiReviewFnc,

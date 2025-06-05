@@ -3,7 +3,6 @@ import { schema as generatedSqlSchema } from "./schema.sql";
 import { postConfirmationFnc } from "../functions/auth/postConfirmation/resources";
 
 import { updateUserAttributesFnc } from "../functions/auth/updateUserAttributes/resources";
-import { generateClient } from "aws-amplify/data";
 import { onUploadS3Fnc } from "../functions/s3/onUpload/resources";
 import { getUserInfoFnc } from "../functions/users/getUserInfo/resource";
 import { listAiReviewsFnc } from "../functions/ai-reviews/list/resources";
@@ -25,6 +24,8 @@ import { listAgentCategoriesFnc } from "../functions/agent-category/list/resourc
 import { createAgentCategoryFnc } from "../functions/agent-category/create/resources";
 import { updateAgentCategoryFnc } from "../functions/agent-category/update/resources";
 import { deleteAgentCategoryFnc } from "../functions/agent-category/delete/resources";
+import { createAgentFnc } from "../functions/agents/create/resources";
+import { generateClient } from "aws-amplify/data";
 
 const sqlSchema = generatedSqlSchema
   .renameModels(() => [
@@ -85,6 +86,8 @@ const sqlSchema = generatedSqlSchema
     allow.resource(onUploadS3Fnc),
     allow.resource(getUserInfoFnc),
 
+    allow.resource(createAgentFnc),
+
     allow.resource(listAiReviewsFnc),
     allow.resource(getAiReviewFnc),
     allow.resource(createAiReviewFnc),
@@ -133,7 +136,25 @@ export const data = defineData({
 
 
 // const amplifyClient = generateClient<Schema>();
-//     const userLikeExists = await amplifyClient.models.UserLikes.get({
-//       user_id: "exampleUserId",
-//       ai_agent_id: "exampleAiAgentId",
-//     })
+// const createAgentResult = await amplifyClient.models.AgentCategories.create({
+//       id: randomUUID().toString(),
+//       name: nameAgent,
+//       description: description,
+//       introduction: introduction,
+//       foreword: foreword,
+//       create_at: new Date().toISOString(),
+//       updated_at: new Date().toISOString(),
+//       suggested_questions: JSON.stringify(suggestedQuestions),
+//       creator_id: String(creatorId),
+//       is_public: 0,
+//       like_count: 0,
+//       total_interactions: 0,
+//       alias_ids: JSON.stringify(""), 
+//       sys_prompt: "",
+//       capabilities: JSON.stringify(""), 
+//       model: "",
+//       cost: 0.0,
+//       status: "ACTIVE",
+//       knowledge_base_url: "",
+//       last_version: "1.0.0",
+//     });

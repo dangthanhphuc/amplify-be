@@ -3,9 +3,9 @@ import { getAmplifyClient } from "../../../utils/clientUtil";
 import { env } from "$amplify/env/getAgentCategoryFnc";
 
 export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
-    const { id } = event.pathParameters || {};
+    const { categoryId } = event.pathParameters || {};
     
-    if (!id) {
+    if (!categoryId) {
         return {
             statusCode: 400,
             body: JSON.stringify({
@@ -17,7 +17,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
     const amplifyClient = await getAmplifyClient(env);
 
     try {
-        const result = await amplifyClient.models.AgentCategories.get({ id });
+        const result = await amplifyClient.models.AgentCategories.get({ id: categoryId });
         
         if (!result.data) {
             return {

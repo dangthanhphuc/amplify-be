@@ -43,6 +43,9 @@ export function createRestApiStack(backend: any) {
   const lambdaForGetAgents = createLambdaIntegrationResponse(
     backend.getAgentsFnc.resources.lambda
   )
+  const lambdaForCreateAgent = createLambdaIntegrationResponse(
+    backend.createAgentFnc.resources.lambda
+  )
 
   const lambdaFordDataForAgents = createLambdaIntegrationResponse(
     backend.initialDataForAiAgentFnc.resources.lambda
@@ -141,7 +144,7 @@ export function createRestApiStack(backend: any) {
   // Tạo agents resource
   const agentsResource = restAPI.root.addResource("agents");
   agentsResource.addMethod("GET", lambdaForGetAgents);
-
+  agentsResource.addMethod("POST", lambdaForCreateAgent);
 
   // User resource
   const userResource = restAPI.root.addResource("users");

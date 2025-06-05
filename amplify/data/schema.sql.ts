@@ -44,14 +44,21 @@ export const schema = configure({
     }
 }).schema({
     "roles": a.model({
-        id: a.integer().required(),
+        id: a.string().required(),
         name: a.string().required()
     }).identifier([
         "id"
     ]),
     "agent_categories": a.model({
-        id: a.integer().required(),
+        id: a.string().required(),
         name: a.string().required()
+    }).identifier([
+        "id"
+    ]),
+    "report_categories": a.model({
+        id: a.string().required(),
+        name: a.string().required(),
+        severity: a.integer()
     }).identifier([
         "id"
     ]),
@@ -63,7 +70,43 @@ export const schema = configure({
         display_name: a.string(),
         profile_image: a.string(),
         description: a.string(),
-        role_id: a.integer()
+        role_id: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "ai_categories": a.model({
+        ai_agent_id: a.string().required(),
+        agent_category_id: a.string().required()
+    }).identifier([
+        "ai_agent_id",
+        "agent_category_id"
+    ]),
+    "user_likes": a.model({
+        user_id: a.string().required(),
+        ai_agent_id: a.string().required(),
+        liked: a.integer(),
+        create_at: a.datetime()
+    }).identifier([
+        "user_id",
+        "ai_agent_id"
+    ]),
+    "ai_reviews": a.model({
+        id: a.string().required(),
+        description: a.string(),
+        rating: a.integer(),
+        create_at: a.datetime(),
+        ai_agent_id: a.string(),
+        reporter_id: a.string(),
+        report_categories_id: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "chats": a.model({
+        id: a.string().required(),
+        raw_content: a.string(),
+        create_at: a.datetime(),
+        user_id: a.string(),
+        ai_agent_id: a.string()
     }).identifier([
         "id"
     ]),
@@ -86,52 +129,10 @@ export const schema = configure({
         capabilities: a.json(),
         alias_ids: a.json(),
         cost: a.float(),
-        suggested_questions: a.json()
-    }).identifier([
-        "id"
-    ]),
-    "ai_categories": a.model({
-        ai_agent_id: a.string().required(),
-        agent_category_id: a.integer().required()
-    }).identifier([
-        "ai_agent_id",
-        "agent_category_id"
-    ]),
-    "chats": a.model({
-        id: a.integer().required(),
-        raw_content: a.string(),
-        create_at: a.datetime(),
-        user_id: a.string(),
-        ai_agent_id: a.string()
-    }).identifier([
-        "id"
-    ]),
-    "report_categories": a.model({
-        id: a.integer().required(),
-        name: a.string().required(),
-        severity: a.integer()
-    }).identifier([
-        "id"
-    ]),
-    "ai_reviews": a.model({
-        id: a.string().required(),
-        description: a.string(),
-        rating: a.integer(),
-        created_at: a.datetime(),
-        ai_agent_id: a.string(),
-        reporter_id: a.string(),
-        report_categories_id: a.integer()
-    }).identifier([
-        "id"
-    ]),
-    "user_likes": a.model({
-        user_id: a.string().required(),
-        ai_agent_id: a.string().required(),
-        liked: a.integer(),
-        create_at: a.datetime(),
+        suggested_questions: a.json(),
+        is_public: a.integer(),
         updated_at: a.datetime()
     }).identifier([
-        "user_id",
-        "ai_agent_id"
+        "id"
     ])
 });

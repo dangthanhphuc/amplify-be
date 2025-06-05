@@ -4,9 +4,9 @@ import { env } from "$amplify/env/deleteAgentCategoryFnc";
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     try {
-        const { id } = event.pathParameters || {};
+        const { categoryId } = event.pathParameters || {};
 
-        if (!id) {
+        if (!categoryId) {
             return {
                 statusCode: 400,
                 headers: {
@@ -22,7 +22,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
         const amplifyClient = await getAmplifyClient(env);
 
         // Delete the agent category
-        await amplifyClient.models.AgentCategories.delete({ id });
+        await amplifyClient.models.AgentCategories.delete({ id: categoryId });
 
         return {
             statusCode: 200,
@@ -32,7 +32,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
             },
             body: JSON.stringify({
                 message: "Agent category deleted successfully",
-                categoryId: id,
+                categoryId: categoryId,
             }),
         };
     } catch (error: any) {

@@ -43,34 +43,35 @@ export const schema = configure({
         }
     }
 }).schema({
-    "roles": a.model({
-        id: a.string().required(),
-        name: a.string().required()
-    }).identifier([
-        "id"
-    ]),
     "agent_categories": a.model({
         id: a.string().required(),
         name: a.string().required()
     }).identifier([
         "id"
     ]),
-    "report_categories": a.model({
+    "ai_agents": a.model({
         id: a.string().required(),
         name: a.string().required(),
-        severity: a.integer()
-    }).identifier([
-        "id"
-    ]),
-    "users": a.model({
-        id: a.string().required(),
-        email: a.string(),
-        password: a.string(),
-        name: a.string(),
-        display_name: a.string(),
-        profile_image: a.string(),
-        description: a.string(),
-        role_id: a.string()
+        icon: a.string(),
+        introduction: a.string().required(),
+        description: a.string().required(),
+        foreword: a.string().required(),
+        last_version: a.string().required(),
+        status: a.string().required(),
+        like_count: a.integer().required(),
+        total_interactions: a.integer().required(),
+        creator_id: a.string().required(),
+        knowledge_base_url: a.string(),
+        sys_prompt: a.string(),
+        create_at: a.datetime().required(),
+        model: a.string(),
+        capabilities: a.string(),
+        alias_ids: a.string().required(),
+        cost: a.float().required(),
+        suggested_questions: a.string().required(),
+        is_public: a.integer().required(),
+        updated_at: a.datetime().required(),
+        type: a.ref("Ai_agentsType").required()
     }).identifier([
         "id"
     ]),
@@ -81,23 +82,14 @@ export const schema = configure({
         "ai_agent_id",
         "agent_category_id"
     ]),
-    "user_likes": a.model({
-        user_id: a.string().required(),
-        ai_agent_id: a.string().required(),
-        liked: a.integer(),
-        create_at: a.datetime()
-    }).identifier([
-        "user_id",
-        "ai_agent_id"
-    ]),
     "ai_reviews": a.model({
         id: a.string().required(),
         description: a.string(),
-        rating: a.integer(),
-        create_at: a.datetime(),
-        ai_agent_id: a.string(),
-        reporter_id: a.string(),
-        report_categories_id: a.string()
+        rating: a.integer().required(),
+        create_at: a.datetime().required(),
+        ai_agent_id: a.string().required(),
+        reporter_id: a.string().required(),
+        report_categories_id: a.string().required()
     }).identifier([
         "id"
     ]),
@@ -110,34 +102,42 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "ai_agents": a.model({
+    "report_categories": a.model({
         id: a.string().required(),
+        name: a.string().required(),
+        severity: a.integer().required()
+    }).identifier([
+        "id"
+    ]),
+    "roles": a.model({
+        id: a.string().required(),
+        name: a.string().required()
+    }).identifier([
+        "id"
+    ]),
+    "user_likes": a.model({
+        user_id: a.string().required(),
+        ai_agent_id: a.string().required(),
+        liked: a.integer(),
+        create_at: a.datetime().required()
+    }).identifier([
+        "user_id",
+        "ai_agent_id"
+    ]),
+    "users": a.model({
+        id: a.string().required(),
+        email: a.string().required(),
         name: a.string(),
-        icon: a.string(),
-        introduction: a.string(),
+        display_name: a.string(),
+        profile_image: a.string(),
         description: a.string(),
-        foreword: a.string(),
-        last_version: a.string(),
-        status: a.string(),
-        like_count: a.integer(),
-        total_interactions: a.integer(),
-        creator_id: a.string(),
-        knowledge_base_url: a.string(),
-        sys_prompt: a.string(),
-        create_at: a.datetime(),
-        model: a.string(),
-        capabilities: a.json(),
-        alias_ids: a.json(),
-        cost: a.float(),
-        suggested_questions: a.json(),
-        is_public: a.integer(),
-        updated_at: a.datetime(),
-        type: a.ref("Ai_agentsType")
+        role_id: a.string().required()
     }).identifier([
         "id"
     ]),
     Ai_agentsType: a.enum([
-        "IN",
-        "OUT"
+        "ADMIN",
+        "EXPERT",
+        "OUTSIDE"
     ])
 });

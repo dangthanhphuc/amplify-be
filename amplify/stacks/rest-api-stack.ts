@@ -119,6 +119,21 @@ export function createRestApiStack(backend: any) {
     backend.deleteAgentCategoryFnc.resources.lambda
   );
 
+  
+  // AI Categories
+  const lambdaForListAiCategories = createLambdaIntegrationResponse(
+    backend.listAiCategoriesFnc.resources.lambda
+  );
+  const lambdaForCreateAiCategory = createLambdaIntegrationResponse(
+    backend.createAiCategoryFnc.resources.lambda
+  );
+  const lambdaForUpdateAiCategory = createLambdaIntegrationResponse(
+    backend.updateAiCategoryFnc.resources.lambda
+  );
+  const lambdaForDeleteAiCategory = createLambdaIntegrationResponse(
+    backend.deleteAiCategoryFnc.resources.lambda
+  );
+
   // const methodOptionsForUsers : MethodOptions = {
   //   authorizationType: AuthorizationType.COGNITO,
   //   authorizer: cognitoAuth,
@@ -194,6 +209,13 @@ export function createRestApiStack(backend: any) {
   agentCategoryByIdResource.addMethod("GET", lambdaForGetAgentCategory);
   agentCategoryByIdResource.addMethod("PUT", lambdaForUpdateAgentCategory);
   agentCategoryByIdResource.addMethod("DELETE", lambdaForDeleteAgentCategory);
+
+  // AI Categories resource
+  const aiCategoriesResource = restAPI.root.addResource("ai-categories");
+  aiCategoriesResource.addMethod("POST", lambdaForCreateAiCategory);
+  aiCategoriesResource.addMethod("GET", lambdaForListAiCategories);
+  aiCategoriesResource.addMethod("DELETE", lambdaForDeleteAiCategory);
+  aiCategoriesResource.addMethod("PUT", lambdaForUpdateAiCategory);
 
   // Test resource
   const testResource = restAPI.root.addResource("test");

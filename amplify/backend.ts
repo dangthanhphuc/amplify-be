@@ -2,7 +2,6 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { createRestApiStack } from './stacks/rest-api-stack';
-
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { storageForProject } from './storage/resource';
 import { getUserInfoFnc } from './functions/users/getUserInfo/resource';
@@ -11,7 +10,6 @@ import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { postConfirmationFnc } from './functions/auth/postConfirmation/resources';
-import { updateUserAttributesFnc } from './functions/auth/updateUserAttributes/resources';
 import { onUploadS3Fnc } from './functions/s3/onUpload/resources';
 import { createAiReviewFnc } from './functions/ai-reviews/create/resources';
 import { getAiReviewFnc } from './functions/ai-reviews/get/resources';
@@ -36,12 +34,17 @@ import { deleteAgentCategoryFnc } from './functions/agent-category/delete/resour
 import { listAgentCategoriesFnc } from './functions/agent-category/list/resources';
 import { updateAgentCategoryFnc } from './functions/agent-category/update/resources';
 import { testFnc } from './functions/tests/resources';
-import { getAgentsFnc } from './functions/ai-agents/get/resources';
-import { initialDataForAiAgentFnc } from './functions/ai-agents/initial-data/resources';
-import { chatWithAgentFnc } from './functions/ai-agents/chatWithAgent/resources';
-import { createAgentFnc } from './functions/ai-agents/create/resources';
-import { deleteAgentFnc } from './functions/ai-agents/delete/resources';
-import { updateAgentFnc } from './functions/ai-agents/update/resources';
+import { updateUserAttributesFnc } from './functions/users/updateUserAttributes/resources';
+import { deleteAiCategoryFnc } from './functions/ai-category/delete/resources';
+import { updateAiCategoryFnc } from './functions/ai-category/update/resources';
+import { createAiCategoryFnc } from './functions/ai-category/create/resources';
+import { listAiCategoriesFnc } from './functions/ai-category/list/resources';
+import { getAgentsFnc } from './functions/ai-agent/get/resources';
+import { createAgentFnc } from './functions/ai-agent/create/resources';
+import { updateAgentFnc } from './functions/ai-agent/update/resources';
+import { deleteAgentFnc } from './functions/ai-agent/delete/resources';
+import { initialDataForAiAgentFnc } from './functions/ai-agent/initial-data/resources';
+import { chatWithAgentFnc } from './functions/ai-agent/chatWithAgent/resources';
 
 
 // Tạo __dirname cho ES modules
@@ -91,6 +94,13 @@ export const backend = defineBackend({
   createAgentCategoryFnc,
   updateAgentCategoryFnc,
   deleteAgentCategoryFnc,
+
+  // AI Categories
+  // getAiCategoryFnc,
+  listAiCategoriesFnc,
+  createAiCategoryFnc,
+  updateAiCategoryFnc,
+  deleteAiCategoryFnc,
 
   testFnc
 });
@@ -168,7 +178,7 @@ backend.createAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
     'secretsmanager:GetSecretValue'
   ],
   resources: ["*"]
-}))
+}));
 
 backend.initialDataForAiAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,

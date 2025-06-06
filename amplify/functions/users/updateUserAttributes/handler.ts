@@ -73,8 +73,6 @@ export const handler : APIGatewayProxyHandler= async (event) => {
             console.info("User update successfully !");
         }
 
-        
-
         return {
             statusCode: 200,
             body: JSON.stringify({

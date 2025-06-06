@@ -1,4 +1,3 @@
-import type { APIGatewayProxyHandler, StreamifyHandler } from "aws-lambda";
 import {
   BedrockAgentRuntimeClient,
   InvokeAgentCommand,
@@ -13,12 +12,9 @@ export const handler = awslambda.streamifyResponse(async (event, responseStream)
         "Content-Type": "text/event-stream",
         "Transfer-Encoding": "chunked",
         Connection: "keep-alive",
-        "Cache-Control": "no-cache",
-        // "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        // "Access-Control-Allow-Origin": "*",
-        // "Access-Control-Allow-Headers": "Content-Type",
+        "Cache-Control": "no-cache"
       }
-    });
+  });
   
   if (!event.body) {
     responseStream.write(JSON.stringify({ error: "No request body" }));
@@ -33,7 +29,6 @@ export const handler = awslambda.streamifyResponse(async (event, responseStream)
     const bedrockAgentRuntime = new BedrockAgentRuntimeClient({
       region: "us-east-1",
     });
-
 
     const command = new InvokeAgentCommand({
       agentId: agentId,
@@ -71,7 +66,6 @@ export const handler = awslambda.streamifyResponse(async (event, responseStream)
       }
       responseStream.end();
     }
-
     return;
   } catch (error: any) {
     console.error("Error log: ", error);
@@ -79,10 +73,7 @@ export const handler = awslambda.streamifyResponse(async (event, responseStream)
         statusCode: 500,
         headers: {
           "Content-Type": "application/json",
-          // "Access-Control-Allow-Origin": "*",
-          // "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-          //   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
-            "Cache-Control": "no-cache"
+          "Cache-Control": "no-cache"
         }
     });  
     responseStream.write(JSON.stringify({error: error.message}));

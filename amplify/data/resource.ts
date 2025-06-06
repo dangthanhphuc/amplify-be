@@ -2,7 +2,6 @@ import { a, defineData, type ClientSchema } from "@aws-amplify/backend";
 import { schema as generatedSqlSchema } from "./schema.sql";
 import { postConfirmationFnc } from "../functions/auth/postConfirmation/resources";
 
-import { updateUserAttributesFnc } from "../functions/auth/updateUserAttributes/resources";
 import { onUploadS3Fnc } from "../functions/s3/onUpload/resources";
 import { getUserInfoFnc } from "../functions/users/getUserInfo/resource";
 import { listAiReviewsFnc } from "../functions/ai-reviews/list/resources";
@@ -25,9 +24,14 @@ import { createAgentCategoryFnc } from "../functions/agent-category/create/resou
 import { updateAgentCategoryFnc } from "../functions/agent-category/update/resources";
 import { deleteAgentCategoryFnc } from "../functions/agent-category/delete/resources";
 import { generateClient } from "aws-amplify/data";
-import { createAgentFnc } from "../functions/ai-agents/create/resources";
-import { deleteAgentFnc } from "../functions/ai-agents/delete/resources";
-import { updateAgentFnc } from "../functions/ai-agents/update/resources";
+import { updateUserAttributesFnc } from "../functions/users/updateUserAttributes/resources";
+import { createAgentFnc } from "../functions/ai-agent/create/resources";
+import { updateAgentFnc } from "../functions/ai-agent/update/resources";
+import { deleteAgentFnc } from "../functions/ai-agent/delete/resources";
+import { listAiCategoriesFnc } from "../functions/ai-category/list/resources";
+import { createAiCategoryFnc } from "../functions/ai-category/create/resources";
+import { updateAiCategoryFnc } from "../functions/ai-category/update/resources";
+import { deleteAiCategoryFnc } from "../functions/ai-category/delete/resources";
 
 
 const sqlSchema = generatedSqlSchema
@@ -94,12 +98,21 @@ const sqlSchema = generatedSqlSchema
     allow.resource(updateAgentFnc),
     allow.resource(deleteAgentFnc),
 
+    // Ai Category
+    // allow.resource(getAiCategoryFnc),
+    allow.resource(listAiCategoriesFnc),
+    allow.resource(createAiCategoryFnc),
+    allow.resource(updateAiCategoryFnc),
+    allow.resource(deleteAiCategoryFnc),
+
+    // Ai Reviews
     allow.resource(listAiReviewsFnc),
     allow.resource(getAiReviewFnc),
     allow.resource(createAiReviewFnc),
     allow.resource(updateAiReviewFnc),
     allow.resource(deleteAiReviewFnc),
 
+    // User Likes
     // allow.resource(getUserLikeFnc),
     allow.resource(listUserLikesFnc),
     allow.resource(createUserLikeFnc),
@@ -146,41 +159,6 @@ export const data = defineData({
 
 
 // const amplifyClient = generateClient<Schema>();
-// const createAgentResult = await amplifyClient.models.AiAgents.update({
-//   id: "453",
-//   name: "Advanced Code Assistant",
-//     // "icon": "https://example.com/icons/code-assistant.png",
-//     introduction: "A powerful AI assistant specialized in code generation and debugging",
-//     "description": "This AI agent helps developers write better code, debug issues, and optimize performance across multiple programming languages.",
-//     foreword: "Welcome to your personal coding companion!",
-//     last_version: "2.1.0",
-//     status: "active",
-//     like_count: 150,
-//     total_interactions: 2500,
-//     creator_id: "user-123-456-789",
-//     knowledge_base_url: "https://docs.example.com/code-assistant-kb",
-//     sys_prompt: "You are an expert programming assistant. Help users write clean, efficient code and solve technical problems.",
-//     model: "gpt-4-turbo",
-//     capabilities: [
-//         "code_generation",
-//         "debugging",
-//         "code_review",
-//         "optimization",
-//         "documentation"
-//     ],
-//     alias_ids: [
-//         "code-helper",
-//         "dev-assistant",
-//         "programming-ai"
-//     ],
-//     cost: 0.02,
-//     suggested_questions: [
-//         "How can I optimize this function?",
-//         "Can you help me debug this error?",
-//         "What's the best practice for this pattern?",
-//         "How do I implement this algorithm?"
-//     ],
-//     is_public: 1,
-//     type: "IN",
-// }
-// )
+//  await amplifyClient.models.AiAgents.get({
+//       id: aiAgentId,
+//     });

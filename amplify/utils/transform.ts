@@ -72,3 +72,10 @@ export async function transformAgentSummariesToModels(
 
   return aiAgents;
 }
+
+export function getVietnamTimestamp() : Date {
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const vietnamTime = new Date(utc + (7 * 3600000)); // UTC+7
+  return vietnamTime;
+}

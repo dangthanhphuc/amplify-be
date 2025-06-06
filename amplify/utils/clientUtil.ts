@@ -35,3 +35,17 @@ export async function getAmplifyClient(env : any) {
     throw new Error(`Failed to initialize Amplify client: ${error.message}`);
   }
 }
+
+export async function initializeAmplifyClient(env : any) {
+    if (cachedClient && isConfigured) {
+        return cachedClient;
+    }
+
+    const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env);
+
+    if (!isConfigured) {
+        Amplify.configure(resourceConfig, libraryOptions);
+        isConfigured = true;
+    }
+    console.log("Amplify client initialized successfully");
+}

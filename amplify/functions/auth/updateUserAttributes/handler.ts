@@ -12,6 +12,10 @@ export const handler : APIGatewayProxyHandler= async (event) => {
     if(!event.body || !userId ) {
         return {
             statusCode: 400,
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
             body: JSON.stringify({
                 message: "Body or attribute not provider"
             })
@@ -26,27 +30,30 @@ export const handler : APIGatewayProxyHandler= async (event) => {
 
         // 1. Update user on cognito
         const userAttributes = [];
+        const userAttributeRDS : any = {};
         
         if (name) {
             userAttributes.push({
                 Name: "name",
                 Value: name
             });
+            userAttributeRDS.name = name;
+
         }
-        
-        // Thêm các thuộc tính tùy chỉnh nếu cần
         if (displayName) {
             userAttributes.push({
                 Name: "custom:display_name",
                 Value: displayName
             });
+             userAttributeRDS.display_name = displayName;
         }
-        
         if (description) {
             userAttributes.push({
                 Name: "custom:desc",
                 Value: description
             });
+            userAttributeRDS.description = description;
+
         }
         
         // Chỉ gọi API nếu có thuộc tính cần cập nhật
@@ -57,16 +64,16 @@ export const handler : APIGatewayProxyHandler= async (event) => {
                 UserAttributes: userAttributes
             }));
             console.info("User attributes updated in Cognito");
+
+            // 2. Update user on rds
+            await amplifyClient.models.Users.update({
+                id: userId,
+                ...userAttributeRDS
+            });
+            console.info("User update successfully !");
         }
 
-        // 2. Update user on rds
-        await amplifyClient.models.Users.update({
-            id: userId,
-            name: name,
-            display_name: displayName,
-            description: description
-        });
-        console.info("User update successfully !");
+        
 
         return {
             statusCode: 200,

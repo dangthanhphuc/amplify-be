@@ -20,7 +20,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
 
   try {
     // First check if the user like exists
-
     const userLikeExists = await amplifyClient.models.UserLikes.get({
       user_id: userId,
       ai_agent_id: aiAgentId,

@@ -12,10 +12,6 @@ export const handler : APIGatewayProxyHandler= async (event) => {
     if(!event.body || !userId ) {
         return {
             statusCode: 400,
-            headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-            },
             body: JSON.stringify({
                 message: "Body or attribute not provider"
             })

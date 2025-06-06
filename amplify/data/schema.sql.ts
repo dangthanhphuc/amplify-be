@@ -131,8 +131,13 @@ export const schema = configure({
         cost: a.float(),
         suggested_questions: a.json(),
         is_public: a.integer(),
-        updated_at: a.datetime()
+        updated_at: a.datetime(),
+        type: a.ref("Ai_agentsType")
     }).identifier([
         "id"
+    ]),
+    Ai_agentsType: a.enum([
+        "IN",
+        "OUT"
     ])
 });

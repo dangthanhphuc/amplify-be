@@ -4,9 +4,6 @@ import { data } from './data/resource';
 import { createRestApiStack } from './stacks/rest-api-stack';
 
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { getAgentsFnc } from './functions/agents/get/resources';
-import { initialDataForAiAgentFnc } from './functions/agents/initial-data/resources';
-import { chatWithAgentFnc } from './functions/agents/chatWithAgent/resources';
 import { storageForProject } from './storage/resource';
 import { getUserInfoFnc } from './functions/users/getUserInfo/resource';
 import {CfnBucket, EventType} from 'aws-cdk-lib/aws-s3';
@@ -39,7 +36,13 @@ import { deleteAgentCategoryFnc } from './functions/agent-category/delete/resour
 import { listAgentCategoriesFnc } from './functions/agent-category/list/resources';
 import { updateAgentCategoryFnc } from './functions/agent-category/update/resources';
 import { testFnc } from './functions/tests/resources';
-import { createAgentFnc } from './functions/agents/create/resources';
+import { getAgentsFnc } from './functions/ai-agents/get/resources';
+import { initialDataForAiAgentFnc } from './functions/ai-agents/initial-data/resources';
+import { chatWithAgentFnc } from './functions/ai-agents/chatWithAgent/resources';
+import { createAgentFnc } from './functions/ai-agents/create/resources';
+import { deleteAgentFnc } from './functions/ai-agents/delete/resources';
+import { updateAgentFnc } from './functions/ai-agents/update/resources';
+
 
 // Tạo __dirname cho ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -51,14 +54,17 @@ export const backend = defineBackend({
   data,
   storageForProject,
   onUploadS3Fnc,
-  getAgentsFnc,
-  initialDataForAiAgentFnc,
-  chatWithAgentFnc,
+
   getUserInfoFnc,
   updateUserAttributesFnc,
   postConfirmationFnc,
 
+  getAgentsFnc,
   createAgentFnc,
+  updateAgentFnc,
+  deleteAgentFnc,
+  initialDataForAiAgentFnc,
+  chatWithAgentFnc,
 
   createAiReviewFnc,
   getAiReviewFnc,

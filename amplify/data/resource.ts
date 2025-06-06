@@ -24,8 +24,11 @@ import { listAgentCategoriesFnc } from "../functions/agent-category/list/resourc
 import { createAgentCategoryFnc } from "../functions/agent-category/create/resources";
 import { updateAgentCategoryFnc } from "../functions/agent-category/update/resources";
 import { deleteAgentCategoryFnc } from "../functions/agent-category/delete/resources";
-import { createAgentFnc } from "../functions/agents/create/resources";
 import { generateClient } from "aws-amplify/data";
+import { createAgentFnc } from "../functions/ai-agents/create/resources";
+import { deleteAgentFnc } from "../functions/ai-agents/delete/resources";
+import { updateAgentFnc } from "../functions/ai-agents/update/resources";
+
 
 const sqlSchema = generatedSqlSchema
   .renameModels(() => [
@@ -86,7 +89,10 @@ const sqlSchema = generatedSqlSchema
     allow.resource(onUploadS3Fnc),
     allow.resource(getUserInfoFnc),
 
+    // Ai Agents
     allow.resource(createAgentFnc),
+    allow.resource(updateAgentFnc),
+    allow.resource(deleteAgentFnc),
 
     allow.resource(listAiReviewsFnc),
     allow.resource(getAiReviewFnc),
@@ -140,25 +146,41 @@ export const data = defineData({
 
 
 // const amplifyClient = generateClient<Schema>();
-// const createAgentResult = await amplifyClient.models.AgentCategories.create({
-//       id: randomUUID().toString(),
-//       name: nameAgent,
-//       description: description,
-//       introduction: introduction,
-//       foreword: foreword,
-//       create_at: new Date().toISOString(),
-//       updated_at: new Date().toISOString(),
-//       suggested_questions: JSON.stringify(suggestedQuestions),
-//       creator_id: String(creatorId),
-//       is_public: 0,
-//       like_count: 0,
-//       total_interactions: 0,
-//       alias_ids: JSON.stringify(""), 
-//       sys_prompt: "",
-//       capabilities: JSON.stringify(""), 
-//       model: "",
-//       cost: 0.0,
-//       status: "ACTIVE",
-//       knowledge_base_url: "",
-//       last_version: "1.0.0",
-//     });
+// const createAgentResult = await amplifyClient.models.AiAgents.update({
+//   id: "453",
+//   name: "Advanced Code Assistant",
+//     // "icon": "https://example.com/icons/code-assistant.png",
+//     introduction: "A powerful AI assistant specialized in code generation and debugging",
+//     "description": "This AI agent helps developers write better code, debug issues, and optimize performance across multiple programming languages.",
+//     foreword: "Welcome to your personal coding companion!",
+//     last_version: "2.1.0",
+//     status: "active",
+//     like_count: 150,
+//     total_interactions: 2500,
+//     creator_id: "user-123-456-789",
+//     knowledge_base_url: "https://docs.example.com/code-assistant-kb",
+//     sys_prompt: "You are an expert programming assistant. Help users write clean, efficient code and solve technical problems.",
+//     model: "gpt-4-turbo",
+//     capabilities: [
+//         "code_generation",
+//         "debugging",
+//         "code_review",
+//         "optimization",
+//         "documentation"
+//     ],
+//     alias_ids: [
+//         "code-helper",
+//         "dev-assistant",
+//         "programming-ai"
+//     ],
+//     cost: 0.02,
+//     suggested_questions: [
+//         "How can I optimize this function?",
+//         "Can you help me debug this error?",
+//         "What's the best practice for this pattern?",
+//         "How do I implement this algorithm?"
+//     ],
+//     is_public: 1,
+//     type: "IN",
+// }
+// )

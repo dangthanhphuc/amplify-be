@@ -43,9 +43,9 @@ export function createRestApiStack(backend: any) {
   const lambdaForGetAgents = createLambdaIntegrationResponse(
     backend.getAgentsFnc.resources.lambda
   )
-  const lambdaForCreateAgent = createLambdaIntegrationResponse(
-    backend.createAgentFnc.resources.lambda
-  )
+  const lambdaForCreateAgent = createLambdaIntegrationResponse(backend.createAgentFnc.resources.lambda);
+  const lamdbaForDeleteAgent = createLambdaIntegrationResponse(backend.deleteAgentFnc.resources.lambda);
+  const lambdaForUpdateAgent = createLambdaIntegrationResponse(backend.updateAgentFnc.resources.lambda);
 
   const lambdaFordDataForAgents = createLambdaIntegrationResponse(
     backend.initialDataForAiAgentFnc.resources.lambda
@@ -145,6 +145,9 @@ export function createRestApiStack(backend: any) {
   const agentsResource = restAPI.root.addResource("agents");
   agentsResource.addMethod("GET", lambdaForGetAgents);
   agentsResource.addMethod("POST", lambdaForCreateAgent);
+  const agentByIdResource = agentsResource.addResource("{agentId}");
+  agentByIdResource.addMethod("DELETE", lamdbaForDeleteAgent);
+  agentByIdResource.addMethod("PUT", lambdaForUpdateAgent);
 
   // User resource
   const userResource = restAPI.root.addResource("users");

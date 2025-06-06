@@ -2,6 +2,7 @@ import type { PreTokenGenerationTriggerHandler } from "aws-lambda";
 
 export const handler: PreTokenGenerationTriggerHandler = async (event) => {
 
+  console.log("Pre Token Generation Trigger Event: ", JSON.stringify(event, null, 2));
     console.log(JSON.stringify(event.request.userAttributes))
 
   event.response = {

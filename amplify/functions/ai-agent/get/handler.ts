@@ -87,7 +87,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
           "last_version",
           "is_public",
           "created_agents.name",
-          "categories.agent_category.name"
+          "categories.agent_category.name",
+          "categories.agent_category.id"
         ] as any;
 
     if (creatorId) {

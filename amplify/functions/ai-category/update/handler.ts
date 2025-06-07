@@ -101,7 +101,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
       resourceArn: env.RDS_ARN,
       secretArn: seccretValue.ARN,
       database: env.RDS_DATABASE,
-      sql: `UPDATE AiCategories 
+      sql: `UPDATE ai_categories
         SET agent_category_id = :newAgentCategoryId, 
           ai_agent_id = :newAiAgentId 
         WHERE agent_category_id = :oldAgentCategoryId 

@@ -32,6 +32,7 @@ import { listAiCategoriesFnc } from "../functions/ai-category/list/resources";
 import { createAiCategoryFnc } from "../functions/ai-category/create/resources";
 import { updateAiCategoryFnc } from "../functions/ai-category/update/resources";
 import { deleteAiCategoryFnc } from "../functions/ai-category/delete/resources";
+import { getAgentsFnc } from "../functions/ai-agent/get/resources";
 
 
 const sqlSchema = generatedSqlSchema
@@ -45,6 +46,22 @@ const sqlSchema = generatedSqlSchema
     ["roles", "Roles"],
     ["user_likes", "UserLikes"],
     ["users", "Users"],
+  ])
+  .setRelationships((models) => [
+    models.Users.relationships({
+      creator: a.hasMany("AiAgents", "creator_id"),
+    }),
+    models.AiAgents.relationships({
+      created_agents: a.belongsTo("Users", "creator_id"),
+      categories: a.hasMany("AiCategories", "ai_agent_id"),
+    }),
+    models.AiCategories.relationships({
+      agent: a.belongsTo("AiAgents", "ai_agent_id"),
+      agent_category: a.belongsTo("AgentCategories", "agent_category_id"),
+    }),
+    models.AgentCategories.relationships({
+      ai_categories: a.hasMany("AiCategories", "agent_category_id"),
+    }),
   ])
   // .setRelationships((models) => [
   //   models.AgentCategories.relationships({
@@ -94,6 +111,7 @@ const sqlSchema = generatedSqlSchema
     allow.resource(getUserInfoFnc),
 
     // Ai Agents
+    allow.resource(getAgentsFnc),
     allow.resource(createAgentFnc),
     allow.resource(updateAgentFnc),
     allow.resource(deleteAgentFnc),

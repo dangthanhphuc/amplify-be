@@ -19,8 +19,9 @@ export interface AiAgentResponse {
     sysPrompt: string;
     createAt: string;
     model: string;
-    capabilities: any[]; // hoặc string[] nếu biết chính xác type
-    aliasIds: string[];     
+    capabilities: any; // hoặc string[] nếu biết chính xác type
+    suggestedQuestions: string;
+    aliasIds: string;     
     cost: number;
     creatorName: string;
     categories: Category[];

@@ -94,7 +94,7 @@ export async function getAllAiAgents(rdsClient: RDSDataClient, resourceArn: stri
             `
         });
 
-        const result = await rdsClient.send(command);
+        const result = await rdsClient.send(command);   
 
         const aiAgentResponse : AiAgentResponse[]= result.records?.map(record => ({
             id: record[0]?.stringValue || '',                    // a.id
@@ -113,13 +113,13 @@ export async function getAllAiAgents(rdsClient: RDSDataClient, resourceArn: stri
             createAt: record[13]?.stringValue || '',             // a.create_at
             model: record[14]?.stringValue || '',                // a.model
             capabilities: record[15]?.stringValue ?             // a.capabilities
-                JSON.parse(record[15].stringValue) : [], 
+                record[15].stringValue : "", 
             aliasIds: record[16]?.stringValue ?                  // a.alias_ids
-                JSON.parse(record[16].stringValue) : [],
+                record[16].stringValue : "",
             cost: record[17]?.doubleValue || 0,                  // a.cost
             creatorName: record[18]?.stringValue || '',          // u.name
             suggestedQuestions: record[19]?.stringValue ?        // a.suggested_questions
-                JSON.parse(record[19].stringValue) : [],
+                record[19].stringValue : "",
             categories: record[20]?.stringValue ?                // JSON_ARRAYAGG(...)
                 JSON.parse(record[20].stringValue).filter((cat: any) => cat !== null) : []
         })) || [];

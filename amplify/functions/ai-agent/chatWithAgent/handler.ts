@@ -4,7 +4,7 @@ import {
 } from "@aws-sdk/client-bedrock-agent-runtime";
 
 export const handler = awslambda.streamifyResponse(async (event, responseStream) => {
-  console.log("Full event:", !event.body);
+  console.log("Full event:", JSON.stringify(event));
 
   responseStream = awslambda.HttpResponseStream.from(responseStream, {
       statusCode: 200,

@@ -159,6 +159,7 @@ export const data = defineData({
 
 
 // const amplifyClient = generateClient<Schema>();
-//  await amplifyClient.models.AiAgents.get({
-//       id: aiAgentId,
+// const aiCategoryUpdated = await amplifyClient.models.AiCategories.update({
+//       agent_category_id: agentCategoryId,
+//       ai_agent_id: aiAgentId,
 //     });

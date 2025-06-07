@@ -1,6 +1,10 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { getAmplifyClient } from "../../../utils/clientUtil";
 import { env } from "$amplify/env/updateAiCategoryFnc";
+import { getRdsClient, getSecretManagerClient } from "../../../utils/clients";
+import { ExecuteStatementCommand } from "@aws-sdk/client-rds-data";
+import { getSecret } from "../../../services/secretManagerService";
+const { RDSDataService } = require('aws-sdk');
 
 export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
   const queryParams = event.queryStringParameters || {};
@@ -88,26 +92,51 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
       };
     }
 
-    const aiCategoryUpdated = await amplifyClient.models.AiCategories.update({
-      agent_category_id: agentCategoryId,
-      ai_agent_id: aiAgentId,
-    });
+    // Update using RDS client
+    const rdsClient = getRdsClient();
+    const secretManageClient = getSecretManagerClient();
+    const seccretValue = await getSecret(secretManageClient, "prod/RDS_SECRET_ARN");
+    
+    const updateParams = {
+      resourceArn: env.RDS_ARN,
+      secretArn: seccretValue.ARN,
+      database: env.RDS_DATABASE,
+      sql: `UPDATE AiCategories 
+        SET agent_category_id = :newAgentCategoryId, 
+          ai_agent_id = :newAiAgentId 
+        WHERE agent_category_id = :oldAgentCategoryId 
+        AND ai_agent_id = :oldAiAgentId`,
+      parameters: [
+      { name: 'newAgentCategoryId', value: { stringValue: agentCategoryId } },
+      { name: 'newAiAgentId', value: { stringValue: aiAgentId } },
+      { name: 'oldAgentCategoryId', value: { stringValue: updateAgentCategoryId } },
+      { name: 'oldAiAgentId', value: { stringValue: updateAiAgentId } }
+      ]
+    };
+    const aiCategoryUpdated = await rdsClient.send(new ExecuteStatementCommand(updateParams));
 
-    if (!aiCategoryUpdated.data) {
-      console.error("AI category update failed:", aiCategoryUpdated);
+    // Check if the update was successful by checking the number of records affected
+    if (aiCategoryUpdated.numberOfRecordsUpdated === 0) {
+      console.error("AI category update failed - no records updated");
       return {
         statusCode: 404,
         body: JSON.stringify({
-          message: "Ai category not found",
+          message: "AI category not found or no changes made",
         }),
       };
     }
 
+    // Fetch the updated record to return to client
+    const fetchUpdatedRecord = await amplifyClient.models.AiCategories.get({
+      agent_category_id: agentCategoryId,
+      ai_agent_id: aiAgentId,
+    });
+
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Ai category updated successfully",
-        data: aiCategoryUpdated.data
+        message: "AI category updated successfully",
+        data: fetchUpdatedRecord.data
       }),
     };
   } catch (error: any) {

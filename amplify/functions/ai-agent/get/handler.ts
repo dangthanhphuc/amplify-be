@@ -112,11 +112,17 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       });
     }
 
+    const finalResult = result.data.map(data => ({
+      ...data,
+      suggested_questions: JSON.parse(data.suggested_questions),
+      alias_ids: JSON.parse(data.alias_ids),
+     }));
+
     return {
       statusCode: 200,
       body: JSON.stringify({
         message: "Ai agent retrieved successfully",
-        data: result.data,
+        data: finalResult,
         nextToken: result.nextToken,
       }),
     };

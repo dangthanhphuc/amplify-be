@@ -50,7 +50,9 @@ export function createRestApiStack(backend: any) {
   const lambdaFordDataForAgents = createLambdaIntegrationResponse(
     backend.initialDataForAiAgentFnc.resources.lambda
   );
-
+  const lambdaForLikeFnc = createLambdaIntegrationResponse(
+    backend.likeFnc.resources.lambda
+  );
   const lambdaForGetUserInfo = createLambdaIntegrationResponse(
     backend.getUserInfoFnc.resources.lambda
   );
@@ -134,6 +136,20 @@ export function createRestApiStack(backend: any) {
     backend.deleteAiCategoryFnc.resources.lambda
   );
 
+  // Agent Version
+  const lambdaForListAgentVersion = createLambdaIntegrationResponse(
+    backend.listAgentVersionFnc.resources.lambda
+  );
+  const lambdaForCreateAgentVersion = createLambdaIntegrationResponse(
+    backend.createAgentVersionFnc.resources.lambda
+  );
+  const lambdaForUpdateAgentVersion = createLambdaIntegrationResponse(
+    backend.updateAgentVersionFnc.resources.lambda
+  );
+  const lambdaForDeleteAgentVersion = createLambdaIntegrationResponse(
+    backend.deleteAgentVersionFnc.resources.lambda
+  );
+
   // const methodOptionsForUsers : MethodOptions = {
   //   authorizationType: AuthorizationType.COGNITO,
   //   authorizer: cognitoAuth,
@@ -186,10 +202,10 @@ export function createRestApiStack(backend: any) {
 
   // User Likes resource
   const userLikesResource = restAPI.root.addResource("user-likes");
-  userLikesResource.addMethod("POST", lambdaForCreateUserLike);
-  userLikesResource.addMethod("GET", lambdaForListUserLikes);
-  userLikesResource.addMethod("PUT", lambdaForUpdateUserLike);
-  userLikesResource.addMethod("DELETE", lambdaForDeleteUserLike);
+  userLikesResource.addMethod("POST", lambdaForLikeFnc);
+  // userLikesResource.addMethod("GET", lambdaForListUserLikes);
+  // userLikesResource.addMethod("PUT", lambdaForUpdateUserLike);
+  // userLikesResource.addMethod("DELETE", lambdaForDeleteUserLike);
 
   // Report Categories resource
   const reportCategoriesResource = restAPI.root.addResource("report-categories");
@@ -216,6 +232,13 @@ export function createRestApiStack(backend: any) {
   aiCategoriesResource.addMethod("GET", lambdaForListAiCategories);
   aiCategoriesResource.addMethod("DELETE", lambdaForDeleteAiCategory);
   aiCategoriesResource.addMethod("PUT", lambdaForUpdateAiCategory);
+
+  // Agent Version resource
+  const agentVersionResource = restAPI.root.addResource("agent-versions");
+  agentVersionResource.addMethod("POST", lambdaForCreateAgentVersion);
+  agentVersionResource.addMethod("GET", lambdaForListAgentVersion);
+  agentVersionResource.addMethod("PUT", lambdaForUpdateAgentVersion);
+  agentVersionResource.addMethod("DELETE", lambdaForDeleteAgentVersion);
 
   // Test resource
   const testResource = restAPI.root.addResource("test");

@@ -6,9 +6,9 @@ import { secret } from "@aws-amplify/backend";
 
 export const schema = configure({
     database: {
-        identifier: "IDafPMCwxtKYEBA8e4Qfjw",
+        identifier: "IDBaHsVLAtoz5dOIGxj8OPw",
         engine: "mysql",
-        connectionUri: secret("SQL_CONNECTION_STRING"),
+        connectionUri: secret("SQL_CONNECTION_STRING_SANDBOX"),
         vpcConfig: {
             vpcId: "vpc-023b988ef1945c386",
             securityGroupIds: [
@@ -51,38 +51,12 @@ export const schema = configure({
     ]),
     "agent_version": a.model({
         ai_agent_id: a.string().required(),
-        value_version: a.string().required(),
+        version_value: a.string().required(),
         update_at: a.datetime(),
         description: a.string()
     }).identifier([
         "ai_agent_id",
-        "value_version"
-    ]),
-    "ai_agents": a.model({
-        id: a.string().required(),
-        name: a.string().required(),
-        icon: a.string(),
-        introduction: a.string().required(),
-        description: a.string().required(),
-        foreword: a.string().required(),
-        last_version: a.string().required(),
-        status: a.string().required(),
-        like_count: a.integer().required(),
-        total_interactions: a.integer().required(),
-        creator_id: a.string().required(),
-        knowledge_base_url: a.string(),
-        sys_prompt: a.string(),
-        create_at: a.datetime().required(),
-        model: a.string(),
-        capabilities: a.string(),
-        alias_ids: a.string().required(),
-        cost: a.float().required(),
-        suggested_questions: a.string().required(),
-        is_public: a.integer().required(),
-        updated_at: a.datetime().required(),
-        type: a.ref("Ai_agentsType").required()
-    }).identifier([
-        "id"
+        "version_value"
     ]),
     "ai_categories": a.model({
         ai_agent_id: a.string().required(),
@@ -119,12 +93,6 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "roles": a.model({
-        id: a.string().required(),
-        name: a.string().required()
-    }).identifier([
-        "id"
-    ]),
     "user_likes": a.model({
         user_id: a.string().required(),
         ai_agent_id: a.string().required(),
@@ -134,6 +102,29 @@ export const schema = configure({
         "user_id",
         "ai_agent_id"
     ]),
+    "ai_agents": a.model({
+        id: a.string().required(),
+        name: a.string().required(),
+        icon: a.string(),
+        introduction: a.string().required(),
+        description: a.string().required(),
+        foreword: a.string().required(),
+        last_version: a.string().required(),
+        status: a.string().required(),
+        like_count: a.integer().required(),
+        total_interactions: a.integer().required(),
+        creator_id: a.string().required(),
+        knowledge_base_url: a.string(),
+        sys_prompt: a.string(),
+        model: a.string(),
+        capabilities: a.string(),
+        cost: a.float().required(),
+        suggested_questions: a.string().required(),
+        is_public: a.integer().required(),
+        type: a.ref("Ai_agentsType").required()
+    }).identifier([
+        "id"
+    ]),
     "users": a.model({
         id: a.string().required(),
         email: a.string().required(),
@@ -141,7 +132,7 @@ export const schema = configure({
         display_name: a.string(),
         profile_image: a.string(),
         description: a.string(),
-        role_id: a.string().required()
+        role_groups: a.string().required()
     }).identifier([
         "id"
     ]),

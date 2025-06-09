@@ -1,74 +1,32 @@
 import type {
-  APIGatewayProxyHandler,
   APIGatewayProxyHandlerV2,
 } from "aws-lambda";
-import { getRdsClient, getSecretManagerClient } from "../../../utils/clients";
-import { getAllAiAgents } from "../../../services/rdsService";
-import { AiAgentResponse } from "../../../interfaces/response/aiAgentResponse";
 import { env } from "$amplify/env/getAgentsFnc";
-import { GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
-import { initializeAmplifyClient } from "../../../utils/clientUtil";
-import { generateClient } from "aws-amplify/data";
-import { Schema } from "../../../data/resource";
+import { getAmplifyClient } from "../../../utils/clientUtil";
 
-// export const handler: APIGatewayProxyHandler = async (event) => {
-//   try {
-
-//     // Required clients
-//     const rdsClient = getRdsClient();
-//     const secretManagerClient = getSecretManagerClient();
-
-//     // Get all ai_agents from db included ai_categories
-//     const secret = await secretManagerClient.send(
-//       new GetSecretValueCommand({ SecretId: "prod/RDS_SECRET_ARN" })
-//     );
-
-//     const aiAgentResponse: AiAgentResponse[] = await getAllAiAgents(
-//       rdsClient,
-//       env.RDS_ARN,
-//       secret.ARN ?? "",
-//       env.RDS_DATABASE
-//     );
-
-//       return {
-//         statusCode: 200,
-//         body: JSON.stringify({
-//           message: "Get all ai agents successfully!",
-//           body: {
-//             aiAgents: aiAgentResponse,
-//           },
-//         }),
-//       };
-
-//   } catch (error: any) {
-//     console.error("Error fetching agents:", error);
-//     return {
-//       statusCode: 500,
-//       body: JSON.stringify({
-//         message: "Error fetching agents",
-//         error: error,
-//       }),
-//     };
-//   }
-// };
-
-await initializeAmplifyClient(env);
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   const queryParams = event.queryStringParameters || {};
-  const { creatorId, limit = "20", nextToken } = queryParams;
+  const { type, creatorId, limit = "20", nextToken } = queryParams;
+
+  if( type && type !== "ADMIN" && type !== "EXPERT" && type !== "OUTSIDE") { 
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "Invalid type parameter. Must be one of: ADMIN, EXPERT, OUTSIDE.",
+      }),
+    };
+  }
 
   // Clients
-  const amplifyClient = generateClient<Schema>();
+  const amplifyClient = await getAmplifyClient(env);
 
   try {
     let result;
 
     const selectionSet = [
-          "alias_ids",
           "capabilities",
           "cost",
-          "create_at",
           "description",
           "foreword",
           "id",
@@ -77,13 +35,10 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
           "knowledge_base_url",
           "model",
           "status",
-          "updated_at",
-          "total_interactions",
           "type",
           "sys_prompt",
           "suggested_questions",
           "name",
-          "like_count",
           "last_version",
           "is_public",
           "created_agents.name",
@@ -91,32 +46,75 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
           "categories.agent_category.id"
         ] as any;
 
+    // ✅ Build filter dynamically based on provided parameters
+    const filter: any = {};
+    
     if (creatorId) {
-      // Filter by Creator ID
+      filter.creator_id = { eq: creatorId };
+    }
+    
+    if (type) {
+      filter.type = { eq: type };
+    }   
+
+    // ✅ Apply filter only if we have any filters, otherwise get all
+    if (Object.keys(filter).length > 0) {
       result = await amplifyClient.models.AiAgents.list({
-        filter: {
-          creator_id: {
-            eq: creatorId,
-          },
-        },
+        filter: filter,
         limit: parseInt(limit),
         nextToken: nextToken || undefined,
         selectionSet: selectionSet,
       });
+      console.log("Applied filters:", JSON.stringify(filter, null, 2));
     } else {
-      // Get all ai agents
+      // Get all ai agents when no filters
       result = await amplifyClient.models.AiAgents.list({
         limit: parseInt(limit),
         nextToken: nextToken || undefined,
         selectionSet: selectionSet,
       });
+      console.log("No filters applied - fetching all agents");
     }
 
-    const finalResult = result.data.map(data => ({
+
+    // if (creatorId) {
+    //   // Filter by Creator ID
+    //   result = await amplifyClient.models.AiAgents.list({
+    //     filter: {
+    //       creator_id: {
+    //         eq: creatorId,
+    //       },
+    //     },
+    //     limit: parseInt(limit),
+    //     nextToken: nextToken || undefined,
+    //     selectionSet: selectionSet,
+    //   });
+    //   console.log("Filter:", JSON.stringify(result, null, 2));
+    // } else if (type) {
+    //   // Filter by Type
+    //   result = await amplifyClient.models.AiAgents.list({
+    //     filter: {
+    //       type: {
+    //         eq: type,
+    //       },
+    //     },
+    //     limit: parseInt(limit),
+    //     nextToken: nextToken || undefined,
+    //     selectionSet: selectionSet,
+    //   });
+    //   console.log("Filter by type:", JSON.stringify(result, null, 2));
+    // } else {
+    //   // Get all ai agents
+    //   result = await amplifyClient.models.AiAgents.list({
+    //     limit: parseInt(limit),
+    //     nextToken: nextToken || undefined,
+    //     selectionSet: selectionSet,
+    //   });
+    // }
+    const finalResult = result.data.map((data : any) => ({
       ...data,
-      suggested_questions: JSON.parse(data.suggested_questions),
-      alias_ids: JSON.parse(data.alias_ids),
-     }));
+      suggested_questions: JSON.parse(data.suggested_questions ?? "[]"),
+    }));
 
     return {
       statusCode: 200,

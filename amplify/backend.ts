@@ -45,6 +45,11 @@ import { updateAgentFnc } from './functions/ai-agent/update/resources';
 import { deleteAgentFnc } from './functions/ai-agent/delete/resources';
 import { initialDataForAiAgentFnc } from './functions/ai-agent/initial-data/resources';
 import { chatWithAgentFnc } from './functions/ai-agent/chatWithAgent/resources';
+import { listAgentVersionFnc } from './functions/agent-version/list/resources';
+import { updateAgentVersionFnc } from './functions/agent-version/update/resources';
+import { deleteAgentVersionFnc } from './functions/agent-version/delete/resources';
+import { createAgentVersionFnc } from './functions/agent-version/create/resources';
+import { likeFnc } from './functions/user-like/like/resources';
 
 
 // Tạo __dirname cho ES modules
@@ -57,6 +62,7 @@ export const backend = defineBackend({
   data,
   storageForProject,
   onUploadS3Fnc,
+  likeFnc,
 
   getUserInfoFnc,
   updateUserAttributesFnc,
@@ -101,6 +107,12 @@ export const backend = defineBackend({
   createAiCategoryFnc,
   updateAiCategoryFnc,
   deleteAiCategoryFnc,
+
+  // Agent Version
+  listAgentVersionFnc,
+  createAgentVersionFnc,
+  updateAgentVersionFnc,
+  deleteAgentVersionFnc,
 
   testFnc
 });
@@ -264,7 +276,7 @@ backend.chatWithAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   resources: ["*"]
 }));
 
-backend.chatWithAgentFnc.resources.lambda.addFunctionUrl({
+const chatWithAgentUrl = backend.chatWithAgentFnc.resources.lambda.addFunctionUrl({
   cors: {
     allowedOrigins: ['*'],
     allowedMethods: [HttpMethod.POST, HttpMethod.GET],
@@ -298,4 +310,12 @@ backend.testFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
 
 // Add outputs from stacks to configuration
 backend.addOutput(restApiOutputs);
-// backend.addOutput(auroraOutputs);
+
+// Add Function URLs to amplify_config.json
+backend.addOutput({
+  custom: {
+    functionUrls: {
+      chatWithAgent: chatWithAgentUrl.url,
+    }
+  }
+});

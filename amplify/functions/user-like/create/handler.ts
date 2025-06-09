@@ -1,6 +1,8 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { getAmplifyClient } from "../../../utils/clientUtil";
 import { env } from "$amplify/env/createUserLikeFnc";
+import { generateClient } from "aws-amplify/api";
+import { Schema } from "../../../data/resource";
 
 export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
   const requestBody = JSON.parse(event.body || "{}");
@@ -44,7 +46,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: any) => {
         create_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
-
+      const se = generateClient<Schema>();
       return {
         statusCode: 201,
         body: JSON.stringify({

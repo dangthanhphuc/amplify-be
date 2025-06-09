@@ -2,6 +2,10 @@ import {
   BedrockAgentRuntimeClient,
   InvokeAgentCommand,
 } from "@aws-sdk/client-bedrock-agent-runtime";
+import { getAmplifyClient } from "../../../utils/clientUtil";
+import { env } from "$amplify/env/chatWithAgentFnc"; 
+import { Chat, createChat } from "../../../services/chatService";
+import { getVietnamTimestamp } from "../../../utils/transform";
 
 export const handler = awslambda.streamifyResponse(async (event, responseStream) => {
   console.log("Full event:", JSON.stringify(event));
@@ -23,7 +27,7 @@ export const handler = awslambda.streamifyResponse(async (event, responseStream)
   }
 
   const requestBody = JSON.parse(event.body);
-  const { prompt, agentId, agentAliasId, sessionId } = requestBody;
+  const { userId, prompt, agentId, agentAliasId, sessionId } = requestBody;
 
   try {
     const bedrockAgentRuntime = new BedrockAgentRuntimeClient({
@@ -59,11 +63,38 @@ export const handler = awslambda.streamifyResponse(async (event, responseStream)
             completion += chunkText;
             chunks.push(chunkText);
            responseStream.write(chunkText);
-            //  responseStream.write(`data: ${JSON.stringify({ text: chunkText })}\n\n`);
-            console.log("Chunk text: ", chunkText);
+            // responseStream.write(`data: ${JSON.stringify({ text: chunkText })}\n\n`);
+            // console.log("Chunk text: ", chunkText);
           }
         }
       }
+
+      // ✅ Save chat to database after streaming complete
+      try {
+        const amplifyClient = await getAmplifyClient(env);
+        const chatByUser : Chat = {
+          aiAgentId: agentId,
+          userId: userId,
+          createdby: "USER",
+          rawContent: prompt,
+          createAt: getVietnamTimestamp()
+        }
+        const resultByAi = await createChat(amplifyClient, chatByUser);
+         const chatByAi : Chat = {
+          aiAgentId: agentId,
+          userId: userId,
+          createdby: "AI",
+          rawContent: completion,
+          createAt: getVietnamTimestamp()
+        }
+        const resultByUser = await createChat(amplifyClient, chatByAi);
+        console.log("Chat user saved successfully:", resultByUser);
+        console.log("Chat ai saved successfully:", resultByUser);
+        
+      } catch (dbError) {
+        console.error("Failed to save chat to database:", dbError);
+      }
+
       responseStream.end();
     }
     return;

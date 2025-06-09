@@ -3,7 +3,6 @@ import { env } from "$amplify/env/postConfirmationFnc";
 import { getAmplifyClient } from "../../../utils/clientUtil";
 import { getCognitoClient } from "../../../utils/clients";
 import { addUserToGroup } from "../../../services/cognitoService";
-import bcrypt from "bcryptjs";
 
 export const handler: PostConfirmationTriggerHandler = async (event) => {
   console.log("PostConfirmation event:", event);

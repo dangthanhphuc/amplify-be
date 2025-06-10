@@ -117,6 +117,8 @@ export const backend = defineBackend({
   testFnc
 });
 
+
+
 // Create REST API stack
 const { outputs: restApiOutputs } = createRestApiStack(backend);
 
@@ -133,6 +135,13 @@ if (cfnResources.cfnUserPoolClient) {
     'ALLOW_USER_SRP_AUTH',
     'ALLOW_CUSTOM_AUTH'
   ];
+
+  cfnResources.cfnUserPoolClient.allowedOAuthScopes = [
+    'email',
+    'openid',
+    'profile',
+    'aws.cognito.signin.user.admin'
+  ]
 }
 
 const { cfnUserPool } = backend.auth.resources.cfnResources;
@@ -319,17 +328,3 @@ backend.addOutput({
     }
   }
 });
-
-// Add output "aws.cognito.signin.user.admin"
-// backend.addOutput({
-//   auth: {
-//     oauth: {
-//       scopes: [
-//         "email",
-//         "openid",
-//         "profile",
-//         "aws.cognito.signin.user.admin"
-//       ]
-//     }
-//   }
-// });

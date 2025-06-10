@@ -319,3 +319,17 @@ backend.addOutput({
     }
   }
 });
+
+// Add output "aws.cognito.signin.user.admin"
+// backend.addOutput({
+//   auth: {
+//     oauth: {
+//       scopes: [
+//         "email",
+//         "openid",
+//         "profile",
+//         "aws.cognito.signin.user.admin"
+//       ]
+//     }
+//   }
+// });

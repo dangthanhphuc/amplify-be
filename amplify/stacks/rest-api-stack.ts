@@ -43,7 +43,7 @@ export function createRestApiStack(backend: any) {
   const lambdaForGetAgents = createLambdaIntegrationResponse(
     backend.getAgentsFnc.resources.lambda
   )
-  const lambdaForCreateAgent = createLambdaIntegrationResponse(backend.createAgentFnc.resources.lambda);
+  const lambdaForCreateAgentOutside = createLambdaIntegrationResponse(backend.createAgentOutsideFnc.resources.lambda);
   const lamdbaForDeleteAgent = createLambdaIntegrationResponse(backend.deleteAgentFnc.resources.lambda);
   const lambdaForUpdateAgent = createLambdaIntegrationResponse(backend.updateAgentFnc.resources.lambda);
 
@@ -175,7 +175,8 @@ export function createRestApiStack(backend: any) {
   // Tạo agents resource
   const agentsResource = restAPI.root.addResource("agents");
   agentsResource.addMethod("GET", lambdaForGetAgents);
-  agentsResource.addMethod("POST", lambdaForCreateAgent);
+  const agentByTypeOutsideResource = agentsResource.addResource("outside");
+  agentByTypeOutsideResource.addMethod("POST", lambdaForCreateAgentOutside);
   const agentByIdResource = agentsResource.addResource("{agentId}");
   agentByIdResource.addMethod("DELETE", lamdbaForDeleteAgent);
   agentByIdResource.addMethod("PUT", lambdaForUpdateAgent);

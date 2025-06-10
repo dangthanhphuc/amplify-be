@@ -40,7 +40,7 @@ import { updateAiCategoryFnc } from './functions/ai-category/update/resources';
 import { createAiCategoryFnc } from './functions/ai-category/create/resources';
 import { listAiCategoriesFnc } from './functions/ai-category/list/resources';
 import { getAgentsFnc } from './functions/ai-agent/get/resources';
-import { createAgentFnc } from './functions/ai-agent/create/resources';
+import { createAgentOutsideFnc } from './functions/ai-agent/create_agent_outside/resources';
 import { updateAgentFnc } from './functions/ai-agent/update/resources';
 import { deleteAgentFnc } from './functions/ai-agent/delete/resources';
 import { initialDataForAiAgentFnc } from './functions/ai-agent/initial-data/resources';
@@ -69,7 +69,7 @@ export const backend = defineBackend({
   postConfirmationFnc,
 
   getAgentsFnc,
-  createAgentFnc,
+  createAgentOutsideFnc,
   updateAgentFnc,
   deleteAgentFnc,
   initialDataForAiAgentFnc,
@@ -187,18 +187,6 @@ backend.onUploadS3Fnc.resources.lambda.addToRolePolicy(new PolicyStatement({
     's3:GetBucketLocation'
   ],
   resources: [`*`]
-}));
-
-backend.createAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
-  effect: Effect.ALLOW,
-  actions: [
-    'rds-data:ExecuteStatement',
-    'rds-data:BatchExecuteStatement',
-    'rds-data:BeginTransaction',
-    'rds-data:CommitTransaction',
-    'secretsmanager:GetSecretValue'
-  ],
-  resources: ["*"]
 }));
 
 backend.updateAiCategoryFnc.resources.lambda.addToRolePolicy(new PolicyStatement({

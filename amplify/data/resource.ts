@@ -25,7 +25,6 @@ import { updateAgentCategoryFnc } from "../functions/agent-category/update/resou
 import { deleteAgentCategoryFnc } from "../functions/agent-category/delete/resources";
 import { generateClient } from "aws-amplify/data";
 import { updateUserAttributesFnc } from "../functions/users/updateUserAttributes/resources";
-import { createAgentFnc } from "../functions/ai-agent/create/resources";
 import { updateAgentFnc } from "../functions/ai-agent/update/resources";
 import { deleteAgentFnc } from "../functions/ai-agent/delete/resources";
 import { listAiCategoriesFnc } from "../functions/ai-category/list/resources";
@@ -40,6 +39,7 @@ import { deleteAgentVersionFnc } from "../functions/agent-version/delete/resourc
 import { chatWithAgentFnc } from "../functions/ai-agent/chatWithAgent/resources";
 import { likeFnc } from "../functions/user-like/like/resources";
 import { testFnc } from "../functions/tests/resources";
+import { createAgentOutsideFnc } from "../functions/ai-agent/create_agent_outside/resources";
 
 
 const sqlSchema = generatedSqlSchema
@@ -107,7 +107,7 @@ const sqlSchema = generatedSqlSchema
 
     // Ai Agents
     allow.resource(getAgentsFnc),
-    allow.resource(createAgentFnc),
+    allow.resource(createAgentOutsideFnc),
     allow.resource(updateAgentFnc),
     allow.resource(deleteAgentFnc),
 

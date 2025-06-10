@@ -29,12 +29,12 @@ export const auth = defineAuth({
       callbackUrls: [
         'http://localhost:3000/auth', 
         'https://trangvang.ai/auth',
-        'https://www.trangvang.ai/auth'
+        // 'https://www.trangvang.ai/auth'
       ],
       logoutUrls: [
         'http://localhost:3000/logout',
         'https://trangvang.ai/logout',
-        'https://www.trangvang.ai/logout'
+        // 'https://www.trangvang.ai/logout'
       ]
     }
   },

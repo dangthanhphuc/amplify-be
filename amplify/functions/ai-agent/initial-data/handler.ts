@@ -1,6 +1,6 @@
 import type { APIGatewayProxyHandler } from "aws-lambda";
 import { RDSDataClient } from "@aws-sdk/client-rds-data";
-import { initialDataForAiAgent } from "../../../services/bedrockService";
+// import { initialDataForAiAgent } from "../../../services/bedrockService";
 import { BedrockAgentClient } from "@aws-sdk/client-bedrock-agent";
 import {
   SecretsManagerClient
@@ -21,19 +21,19 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       region
     });
 
-    const result = await initialDataForAiAgent(
-      env.RDS_ARN,
-      env.RDS_DATABASE,
-      secretManagerClient,
-      rdsClient,
-      bedrockClient
-    );
+    // const result = await initialDataForAiAgent(
+    //   env.RDS_ARN,
+    //   env.RDS_DATABASE,
+    //   secretManagerClient,
+    //   rdsClient,
+    //   bedrockClient
+    // );
 
     return {
       statusCode: 200,
       body: JSON.stringify({
         message: "Agents fetched and stored successfully",
-        result,
+        // result,
       }),
     };
 

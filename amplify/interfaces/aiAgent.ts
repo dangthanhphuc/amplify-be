@@ -1,6 +1,6 @@
 export interface AiAgent {
     id: string;
-    aliasIds: AliasIds[];
+    agentVersions: AgentVersion[];
     name: string;
     status: string;
     description: string;
@@ -13,14 +13,16 @@ export interface AiAgent {
     icon: string | undefined;
     foreword: string | undefined;
     sysPrompt: string | undefined;
-    createAt: Date;
     model: string | undefined;
     capabilities: string[];
     cost: number;
     suggestQuestions: string[];
 }
 
-export interface AliasIds {
-    agentAliasId: string;
+export interface AgentVersion {
+    agentId: string;
+    versionValue: string;
+    description?: string;
+    createdAt: string;
     updateAt: string;
 }

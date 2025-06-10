@@ -39,6 +39,7 @@ import { updateAgentVersionFnc } from "../functions/agent-version/update/resourc
 import { deleteAgentVersionFnc } from "../functions/agent-version/delete/resources";
 import { chatWithAgentFnc } from "../functions/ai-agent/chatWithAgent/resources";
 import { likeFnc } from "../functions/user-like/like/resources";
+import { testFnc } from "../functions/tests/resources";
 
 
 const sqlSchema = generatedSqlSchema
@@ -64,7 +65,7 @@ const sqlSchema = generatedSqlSchema
       created_agents: a.belongsTo("Users", "creator_id"),
       categories: a.hasMany("AiCategories", "ai_agent_id"),
       versions: a.hasMany("AgentVersion", "ai_agent_id"),
-      // chats: a.hasMany("Chats", "ai_agent_id"),
+      chats: a.hasMany("Chats", "ai_agent_id"),
       // user_likes: a.hasMany("UserLikes", "ai_agent_id"),
       // ai_revirews: a.hasMany("AiReviews", "ai_agent_id"),
     }),
@@ -86,12 +87,12 @@ const sqlSchema = generatedSqlSchema
     //   agent: a.belongsTo("AiAgents", "ai_agent_id"),
     //   user: a.belongsTo("Users", "reporter_id"),
     // }),
-    // models.Chats.relationships({
-    //   ai_agent: a.belongsTo("AiAgents", "ai_agent_id"),
-    //   user: a.belongsTo("Users", "user_id"),
-    // }),
+    models.Chats.relationships({
+      ai_agent: a.belongsTo("AiAgents", "ai_agent_id"),
+      // user: a.belongsTo("Users", "user_id"),
+    }),
     // models.UserLikes.relationships({
-    //   user: a.belongsTo("Users", "user_id"),
+    //   // user: a.belongsTo("Users", "user_id"),
     //   ai_agent: a.belongsTo("AiAgents", "ai_agent_id"),
     // }),
   ])
@@ -102,6 +103,7 @@ const sqlSchema = generatedSqlSchema
     allow.resource(getUserInfoFnc),
     allow.resource(chatWithAgentFnc),
     allow.resource(likeFnc),
+    allow.resource(testFnc),
 
     // Ai Agents
     allow.resource(getAgentsFnc),
@@ -150,7 +152,10 @@ const sqlSchema = generatedSqlSchema
     allow.resource(updateAgentVersionFnc),
     allow.resource(deleteAgentVersionFnc),
 
-  ]); // Cấp quyền truy cập cho lambda để thao tác trên lược đồ 
+  ])
+  // .addToSchema({
+  //   "s"
+  // }); 
 
 // const schema = a.schema({
 //   Todo: a.model({

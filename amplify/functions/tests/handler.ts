@@ -1,73 +1,45 @@
-import { BedrockRuntimeClient, InvokeModelWithResponseStreamCommand } from "@aws-sdk/client-bedrock-runtime";
+import { APIGatewayProxyHandlerV2 } from "aws-lambda";
+import { getAmplifyClient } from "../../utils/clientUtil";
+import { env } from "$amplify/env/testFnc";
+import { syncDataFromBebrock } from "../../services/aiAgentService";
+import { getBedrockClient } from "../../utils/clients";
 
-export const handler = awslambda.streamifyResponse(async (event, responseStream) => {
-  try {
-    const bedrockRuntimeClient = new BedrockRuntimeClient({
-      region: "us-east-1",
-    });
+export const handler : APIGatewayProxyHandlerV2 = async (event) => {
 
-    const requestBody = JSON.parse(event.body);
-    const { prompt, agentId, agentAliasId, sessionId } = requestBody;
+  const queryParams = event.queryStringParameters || {};
+  const { aiAgentId } = queryParams;
 
-    const payload = {
-  inputText: prompt,
-  textGenerationConfig: {
-    maxTokenCount: 1024,
-    temperature: 0.7,
-    topP: 0.9
+  if(!aiAgentId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "aiAgentId is required."
+      })
+    };
   }
-};
 
-    const command = new InvokeModelWithResponseStreamCommand({
-      modelId: "amazon.titan-text-express-v1",
-      contentType: "application/json",
-      body: JSON.stringify(payload)
-    })
-        
-    const response = await bedrockRuntimeClient.send(command);
+  //Clients
+  const amplifyClient = await getAmplifyClient(env);
+  const bedrockClient = getBedrockClient();
+  try {
 
-    let completion = "";
-    const traces: any[] = [];
-    const chunks: string[] = [];
+    const agentData = await syncDataFromBebrock(amplifyClient, aiAgentId, bedrockClient);
 
-    responseStream = awslambda.HttpResponseStream.from(responseStream, {
+    return {
       statusCode: 200,
-      headers: {
-        "Content-Type": "text/event-stream",
-        "Transfer-Encoding": "chunked",
-        Connection: "keep-alive",
-        "Cache-Control": "no-cache",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-      }
-    });
-
-    if(response.body){
-      for await (const chunk of response.body) {
-       const parsed = JSON.parse(new TextDecoder().decode(chunk.chunk?.bytes));
-       if(parsed.type === "content_block_delta") {
-        responseStream.write(parsed.delta.text);
-       }
-      }
-      responseStream.end();
-    }
-
-    return;
+      body: JSON.stringify({
+        message: "Agent data synced successfully",
+        data: agentData,
+      }),
+    };
   } catch (error: any) {
     console.error("Error log: ", error);
-    responseStream = awslambda.HttpResponseStream.from(responseStream, {
-        statusCode: 500,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
-            "Cache-Control": "no-cache"
-        }
-    });  
-    responseStream.write(JSON.stringify({error: error.message}));
-    responseStream.end();
-    return ;
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Error syncing agent data",
+        error: error.message || "Unknown error",
+      }),
+    };
   }
-});
+};

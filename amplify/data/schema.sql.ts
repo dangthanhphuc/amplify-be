@@ -51,12 +51,15 @@ export const schema = configure({
     ]),
     "agent_version": a.model({
         ai_agent_id: a.string().required(),
-        value_version: a.string().required(),
+        version_value: a.string().required(),
         update_at: a.datetime(),
-        description: a.string()
+        description: a.string(),
+        created_at: a.datetime(),
+        enable: a.integer(),
+        status: a.ref("Agent_versionStatus")
     }).identifier([
         "ai_agent_id",
-        "value_version"
+        "version_value"
     ]),
     "ai_agents": a.model({
         id: a.string().required(),
@@ -67,20 +70,17 @@ export const schema = configure({
         foreword: a.string().required(),
         last_version: a.string().required(),
         status: a.string().required(),
-        like_count: a.integer().required(),
-        total_interactions: a.integer().required(),
         creator_id: a.string().required(),
         knowledge_base_url: a.string(),
         sys_prompt: a.string(),
-        create_at: a.datetime().required(),
         model: a.string(),
         capabilities: a.string(),
-        alias_ids: a.string().required(),
         cost: a.float().required(),
         suggested_questions: a.string().required(),
         is_public: a.integer().required(),
-        updated_at: a.datetime().required(),
-        type: a.ref("Ai_agentsType").required()
+        type: a.ref("Ai_agentsType").required(),
+        like_count: a.integer().required(),
+        total_interactions: a.integer().required()
     }).identifier([
         "id"
     ]),
@@ -119,12 +119,6 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "roles": a.model({
-        id: a.string().required(),
-        name: a.string().required()
-    }).identifier([
-        "id"
-    ]),
     "user_likes": a.model({
         user_id: a.string().required(),
         ai_agent_id: a.string().required(),
@@ -141,9 +135,17 @@ export const schema = configure({
         display_name: a.string(),
         profile_image: a.string(),
         description: a.string(),
-        role_id: a.string().required()
+        role_groups: a.string().required()
     }).identifier([
         "id"
+    ]),
+    Agent_versionStatus: a.enum([
+        "CREATING",
+        "PREPARED",
+        "FAILED",
+        "UPDATING",
+        "DELETING",
+        "DISSOCIATED"
     ]),
     ChatsCreate_by: a.enum([
         "AI",

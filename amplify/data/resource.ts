@@ -1,5 +1,5 @@
 import { a, defineData, type ClientSchema } from "@aws-amplify/backend";
-import { schema as generatedSqlSchema } from "./schema_sandbox.sql";
+import { schema as generatedSqlSchema } from "./schema.sql";
 import { postConfirmationFnc } from "../functions/auth/postConfirmation/resources";
 
 import { onUploadS3Fnc } from "../functions/s3/onUpload/resources";

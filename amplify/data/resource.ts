@@ -43,6 +43,8 @@ import { createAgentOutsideFnc } from "../functions/ai-agent/create_agent_outsid
 import { syncDataFromBedrockFnc } from "../functions/ai-agent/syncDataFromBedrock/resources";
 import { syncAllDataFromBedrockFnc } from "../functions/ai-agent/syncAllDataFromBedrock/resources";
 import { createAgentExpertFnc } from "../functions/ai-agent/create_agent_admin/resources";
+import { Chat } from './../services/chatService';
+import { listChatByUserIdFnc } from "../functions/chat/list/resources";
 
 
 const sqlSchema = generatedSqlSchema
@@ -107,6 +109,9 @@ const sqlSchema = generatedSqlSchema
     allow.resource(chatWithAgentFnc),
     allow.resource(likeFnc),
     allow.resource(testFnc),
+
+    // Chat
+    allow.resource(listChatByUserIdFnc),
 
     // Ai Agents
     allow.resource(getAgentsFnc),

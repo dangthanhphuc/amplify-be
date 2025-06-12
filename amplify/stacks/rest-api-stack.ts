@@ -64,6 +64,11 @@ export function createRestApiStack(backend: any) {
     backend.updateUserAttributesFnc.resources.lambda
   );
 
+
+  const lambdaForListChatByUserId = createLambdaIntegrationResponse(
+    backend.listChatByUserIdFnc.resources.lambda
+  );
+
   const lambdaForCreateAiReview = createLambdaIntegrationResponse(
     backend.createAiReviewFnc.resources.lambda
   );
@@ -248,6 +253,10 @@ export function createRestApiStack(backend: any) {
   agentVersionResource.addMethod("GET", lambdaForListAgentVersion);
   agentVersionResource.addMethod("PUT", lambdaForUpdateAgentVersion);
   agentVersionResource.addMethod("DELETE", lambdaForDeleteAgentVersion);
+
+  // Chats
+  const chatResource = restAPI.root.addResource("chats");
+  chatResource.addMethod("GET", lambdaForListChatByUserId);
 
   // Test resource
   const testResource = restAPI.root.addResource("test");

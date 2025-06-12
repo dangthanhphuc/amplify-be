@@ -44,11 +44,15 @@ export function createRestApiStack(backend: any) {
     backend.getAgentsFnc.resources.lambda
   )
   const lambdaForCreateAgentOutside = createLambdaIntegrationResponse(backend.createAgentOutsideFnc.resources.lambda);
+  const lambdaForCreateAgentExpert = createLambdaIntegrationResponse(backend.createAgentExpertFnc.resources.lambda);
   const lamdbaForDeleteAgent = createLambdaIntegrationResponse(backend.deleteAgentFnc.resources.lambda);
   const lambdaForUpdateAgent = createLambdaIntegrationResponse(backend.updateAgentFnc.resources.lambda);
 
-  const lambdaFordDataForAgents = createLambdaIntegrationResponse(
-    backend.initialDataForAiAgentFnc.resources.lambda
+  const lambdaFordSyncDataFromBedrockFnc = createLambdaIntegrationResponse(
+    backend.syncDataFromBedrockFnc.resources.lambda
+  );
+  const lambdaFordSyncAllDataFromBedrockFnc = createLambdaIntegrationResponse(
+    backend.syncAllDataFromBedrockFnc.resources.lambda
   );
   const lambdaForLikeFnc = createLambdaIntegrationResponse(
     backend.likeFnc.resources.lambda
@@ -177,6 +181,8 @@ export function createRestApiStack(backend: any) {
   agentsResource.addMethod("GET", lambdaForGetAgents);
   const agentByTypeOutsideResource = agentsResource.addResource("outside");
   agentByTypeOutsideResource.addMethod("POST", lambdaForCreateAgentOutside);
+  const agentByTypeExpertResource = agentsResource.addResource("expert");
+  agentByTypeExpertResource.addMethod("POST", lambdaForCreateAgentExpert);
   const agentByIdResource = agentsResource.addResource("{agentId}");
   agentByIdResource.addMethod("DELETE", lamdbaForDeleteAgent);
   agentByIdResource.addMethod("PUT", lambdaForUpdateAgent);
@@ -188,8 +194,10 @@ export function createRestApiStack(backend: any) {
   userResource.addMethod("PUT", lambdaForUpdateUserAttributes);
 
   // Add source for db
-  const dataForAgents = restAPI.root.addResource("dataForAgents");
-  dataForAgents.addMethod("GET", lambdaFordDataForAgents)
+  const dataForAgents = restAPI.root.addResource("syncDataFromBedrock");
+  dataForAgents.addMethod("PUT", lambdaFordSyncDataFromBedrockFnc)
+  const syncAllDataFromBedrock = restAPI.root.addResource("syncAllDataFromBedrock");
+  syncAllDataFromBedrock.addMethod("PUT", lambdaFordSyncAllDataFromBedrockFnc);
 
   // AI Reviews resource
   const aiReviewsResource = restAPI.root.addResource("ai-reviews");

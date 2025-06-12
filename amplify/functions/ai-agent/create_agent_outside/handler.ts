@@ -30,7 +30,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 // suggestedQuestions
 
 
-
   // Validate required fields
   if (!name || !creatorId || !introduction || !description || !foreword || !lastVersion
     || !capabilities || !cost
@@ -45,7 +44,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 
   // Clients
   const amplifyClient = await getAmplifyClient(env);
-  // const amplifyClient = generateClient<Schema>();
 
   try {
 

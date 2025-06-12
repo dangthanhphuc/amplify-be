@@ -62,9 +62,10 @@ export const handler = awslambda.streamifyResponse(async (event, responseStream)
             const chunkText = decoder.decode(chunk.bytes);
             completion += chunkText;
             chunks.push(chunkText);
+            console.log("Chunk text: ", chunkText);
            responseStream.write(chunkText);
             // responseStream.write(`data: ${JSON.stringify({ text: chunkText })}\n\n`);
-            // console.log("Chunk text: ", chunkText);
+            
           }
         }
       }

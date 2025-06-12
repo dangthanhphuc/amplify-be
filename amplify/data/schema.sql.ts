@@ -56,7 +56,8 @@ export const schema = configure({
         description: a.string(),
         created_at: a.datetime(),
         enable: a.integer(),
-        status: a.ref("Agent_versionStatus")
+        status: a.ref("Agent_versionStatus"),
+        name: a.string()
     }).identifier([
         "ai_agent_id",
         "version_value"

@@ -43,13 +43,15 @@ import { getAgentsFnc } from './functions/ai-agent/get/resources';
 import { createAgentOutsideFnc } from './functions/ai-agent/create_agent_outside/resources';
 import { updateAgentFnc } from './functions/ai-agent/update/resources';
 import { deleteAgentFnc } from './functions/ai-agent/delete/resources';
-import { initialDataForAiAgentFnc } from './functions/ai-agent/initial-data/resources';
 import { chatWithAgentFnc } from './functions/ai-agent/chatWithAgent/resources';
 import { listAgentVersionFnc } from './functions/agent-version/list/resources';
 import { updateAgentVersionFnc } from './functions/agent-version/update/resources';
 import { deleteAgentVersionFnc } from './functions/agent-version/delete/resources';
 import { createAgentVersionFnc } from './functions/agent-version/create/resources';
 import { likeFnc } from './functions/user-like/like/resources';
+import { createAgentExpertFnc } from './functions/ai-agent/create_agent_admin/resources';
+import { syncDataFromBedrockFnc } from './functions/ai-agent/syncDataFromBedrock/resources';
+import { syncAllDataFromBedrockFnc } from './functions/ai-agent/syncAllDataFromBedrock/resources';
 
 
 // Tạo __dirname cho ES modules
@@ -70,9 +72,11 @@ export const backend = defineBackend({
 
   getAgentsFnc,
   createAgentOutsideFnc,
+  createAgentExpertFnc,
   updateAgentFnc,
   deleteAgentFnc,
-  initialDataForAiAgentFnc,
+  syncDataFromBedrockFnc,
+  syncAllDataFromBedrockFnc,
   chatWithAgentFnc,
 
   createAiReviewFnc,
@@ -189,6 +193,14 @@ backend.onUploadS3Fnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   resources: [`*`]
 }));
 
+backend.createAgentExpertFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    "*"
+  ],
+  resources: ["*"]
+}));
+
 backend.updateAiCategoryFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
   actions: [
@@ -201,19 +213,19 @@ backend.updateAiCategoryFnc.resources.lambda.addToRolePolicy(new PolicyStatement
   resources: ["*"]
 }));
 
-backend.initialDataForAiAgentFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+
+backend.syncAllDataFromBedrockFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
   actions: [
-    'bedrock:ListAgents',
-    'bedrock:GetAgent',
-    'bedrock:ListAgentCategories',
-    'bedrock:ListAgentAliases',
-    'rds-data:ExecuteStatement',
-    'rds-data:BatchExecuteStatement',
-    'rds-data:BeginTransaction',
-    'rds-data:CommitTransaction',
-    'secretsmanager:GetSecretValue',
-    'rds-data:BatchExecuteStatement'
+    "*"
+  ],
+  resources: ["*"]
+}));
+
+backend.syncDataFromBedrockFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    "*"
   ],
   resources: ["*"]
 }));
@@ -297,6 +309,7 @@ const chatWithAgentUrl = backend.chatWithAgentFnc.resources.lambda.addFunctionUr
   invokeMode: InvokeMode.RESPONSE_STREAM,
 });
 
+// bedrock:CreateKnowledgeBase
 backend.testFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
   actions: [

@@ -1,17 +1,14 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { env } from "$amplify/env/syncAllDataFromBedrockFnc";
 import { getAmplifyClient } from "../../../utils/clientUtil";
-import { getBedrockClient } from "../../../utils/clients";
 import { syncDataFromBebrock } from "../../../services/aiAgentService";
-import { generateClient } from "aws-amplify/data";
-import { Schema } from "../../../data/resource";
 import { BedrockAgentClient, ListAgentsCommand } from "@aws-sdk/client-bedrock-agent";
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   //Clients
   const amplifyClient = await getAmplifyClient(env);
   const bedrockClient = new BedrockAgentClient();
-  const s = generateClient<Schema>();
+
   try {
     const result: any[] = [];
 

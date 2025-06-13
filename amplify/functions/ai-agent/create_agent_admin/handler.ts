@@ -66,11 +66,14 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       creatorId,
       knowledgeBaseUrl,
       sysPromt,
-      model = "anthropic.claude-3-5-sonnet-20241022-v2:0",
+      model = "arn:aws:bedrock:us-east-1:842676020404:inference-profile/us.anthropic.claude-3-5-sonnet-20241022-v2:0",
       capabilities,
       cost,
-      sugggestedQuestions,
-      s3Uri,
+      type,
+      suggestedQuestions,
+      categoryIds,
+      icon,
+      s3Arn, 
       aliasName,
       aliasDescription,
     } = body;
@@ -86,7 +89,9 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       sysPromt,
       model,
       capabilities,
-      cost
+      categoryIds,
+      cost,
+      type
     };
     const missingParams = Object.entries(requiredParams)
       .filter(([_, value]) => !value)
@@ -160,11 +165,10 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
         dataSourceConfiguration: {
           type: "S3",
           s3Configuration: {
-            bucketArn: s3Uri,
-            // inclusionPrefixes: [
-            //   "STRING_VALUE",
-            // ],
-            // bucketOwnerAccountId: "STRING_VALUE",
+            bucketArn: `arn:aws:s3:::${s3Arn}`,
+            inclusionPrefixes: [
+              knowledgeBaseUrl
+            ],
           },
         },
       })
@@ -315,14 +319,15 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       creator_id: creatorId || "1",
       sys_prompt: sysPromt || "",
       knowledge_base_url: knowledgeBaseUrl || "",
-      suggested_questions: JSON.parse(sugggestedQuestions || []),
+      suggested_questions: JSON.parse(suggestedQuestions || []),
       is_public: 0,
-      type: "ADMIN",
+      type,
       model: createAgentResponse.agent?.foundationModel || "",
+      icon: icon || "public-images/ai.png",
     });
     console.log("Agent created in RDS:", JSON.stringify(agentResult, null, 2));
 
-    const agentVersion = await s.models.AgentVersion.create({
+    const agentVersion = await amiplifyClient.models.AgentVersion.create({
       ai_agent_id: agentId,
       version_value: createAliasResponse.agentAlias?.agentAliasId || "",
       name: createAliasResponse.agentAlias?.agentAliasName || "",
@@ -333,6 +338,22 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       enable: 0,
     });
     console.log("Agent version created in RDS:", JSON.stringify(agentVersion, null, 2));
+
+    for (const categoryId of categoryIds) {
+      const existingCategory = await amiplifyClient.models.AgentCategories.get({
+        id: categoryId
+      })
+
+      if (!existingCategory) {
+        throw new Error(`Category with ID ${categoryId} does not exist`);
+      }
+
+      const result = await amiplifyClient.models.AiCategories.create({
+        ai_agent_id: agentId,
+        agent_category_id: categoryId,
+      });
+      console.log("Category associated with agent in RDS:", JSON.stringify(result, null, 2));
+    }
 
     // Step 16: Get final information
     logger.info("📋 Step 16: Getting final information for response...");

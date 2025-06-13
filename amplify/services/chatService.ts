@@ -1,11 +1,4 @@
-import { generateClient } from "aws-amplify/api";
-import { initializeAmplifyClient } from "../utils/clientUtil";
-import { Schema } from "../data/resource";
 import { getVietnamTimestamp } from "../utils/transform";
-
-
-
-const amplifyClientsss = generateClient<Schema>();
 
 export interface Chat {
     aiAgentId: string;

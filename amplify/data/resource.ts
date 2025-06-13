@@ -1,6 +1,7 @@
 import { a, defineData, type ClientSchema } from "@aws-amplify/backend";
 import { schema as generatedSqlSchema } from "./schema.sql";
 import { postConfirmationFnc } from "../functions/auth/postConfirmation/resources";
+import { preTokenGeneration } from "../auth/pre-token-generation/resource";
 
 import { onUploadS3Fnc } from "../functions/s3/onUpload/resources";
 import { getUserInfoFnc } from "../functions/users/getUserInfo/resource";
@@ -100,9 +101,9 @@ const sqlSchema = generatedSqlSchema
     //   // user: a.belongsTo("Users", "user_id"),
     //   ai_agent: a.belongsTo("AiAgents", "ai_agent_id"),
     // }),
-  ])
-  .authorization((allow) => [
+  ])  .authorization((allow) => [
     allow.resource(postConfirmationFnc),
+    allow.resource(preTokenGeneration),
     allow.resource(updateUserAttributesFnc),
     allow.resource(onUploadS3Fnc),
     allow.resource(getUserInfoFnc),

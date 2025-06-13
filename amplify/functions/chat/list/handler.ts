@@ -16,7 +16,7 @@ export const handler : APIGatewayProxyHandlerV2 = async (event) => {
                 message: "Bad Request",
                 error: "Missing required query parameter: userId"
             })
-        };
+        };  
     }
 
     // Clients
@@ -39,8 +39,12 @@ export const handler : APIGatewayProxyHandlerV2 = async (event) => {
             };
         }
 
-        const existingChat = await amplifyClient    .models.Chats.list({
+        const existingChat = await e.models.Chats.list({
             filter: {user_id: {eq: userId}},
+            selectionSet: [
+                "ai_agent.icon",
+                "ai_agent.name",
+            ]
         });
 
         return {

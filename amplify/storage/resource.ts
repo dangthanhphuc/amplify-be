@@ -14,7 +14,7 @@ export const storageForProject = defineStorage({
         ],
         'public-images/*': [
             allow.guest.to(['read']),
-            allow.authenticated.to(['read']),
+            allow.authenticated.to(['read', 'write']),
             allow.groups(["USERS"]).to(['read']),
         ]
     }),

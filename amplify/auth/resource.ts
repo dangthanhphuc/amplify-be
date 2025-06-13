@@ -64,9 +64,10 @@ export const auth = defineAuth({
   groups: ["USERS", "EXPERTS", "ADMINS"],
   triggers: { 
     postConfirmation: postConfirmationFnc,
-    preTokenGeneration: preTokenGeneration
+    preTokenGeneration: preTokenGeneration,
   },
   access: (allow) => [
-    allow.resource(postConfirmationFnc).to(["addUserToGroup"])
+    allow.resource(postConfirmationFnc).to(["addUserToGroup"]),
+    allow.resource(preTokenGeneration).to(["addUserToGroup"])
   ]
 });

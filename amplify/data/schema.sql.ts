@@ -49,42 +49,6 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "agent_version": a.model({
-        ai_agent_id: a.string().required(),
-        version_value: a.string().required(),
-        update_at: a.datetime(),
-        description: a.string(),
-        created_at: a.datetime(),
-        enable: a.integer(),
-        status: a.ref("Agent_versionStatus"),
-        name: a.string()
-    }).identifier([
-        "ai_agent_id",
-        "version_value"
-    ]),
-    "ai_agents": a.model({
-        id: a.string().required(),
-        name: a.string().required(),
-        icon: a.string(),
-        introduction: a.string(),
-        description: a.string(),
-        foreword: a.string().required(),
-        last_version: a.string(),
-        status: a.string().required(),
-        creator_id: a.string().required(),
-        knowledge_base_url: a.string(),
-        sys_prompt: a.string(),
-        model: a.string(),
-        capabilities: a.string(),
-        cost: a.float().required(),
-        suggested_questions: a.string(),
-        is_public: a.integer().required(),
-        type: a.ref("Ai_agentsType").required(),
-        like_count: a.integer().required(),
-        total_interactions: a.integer().required()
-    }).identifier([
-        "id"
-    ]),
     "ai_categories": a.model({
         ai_agent_id: a.string().required(),
         agent_category_id: a.string().required()
@@ -140,6 +104,47 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
+    "agent_version": a.model({
+        ai_agent_id: a.string().required(),
+        version_value: a.string().required(),
+        update_at: a.datetime(),
+        description: a.string(),
+        created_at: a.datetime(),
+        enable: a.integer(),
+        status: a.ref("Agent_versionStatus"),
+        name: a.string()
+    }).identifier([
+        "ai_agent_id",
+        "version_value"
+    ]),
+    "ai_agents": a.model({
+        id: a.string().required(),
+        name: a.string().required(),
+        icon: a.string(),
+        introduction: a.string(),
+        description: a.string(),
+        foreword: a.string().required(),
+        last_version: a.string(),
+        status: a.string().required(),
+        creator_id: a.string().required(),
+        knowledge_base_url: a.string(),
+        sys_prompt: a.string(),
+        model: a.string(),
+        capabilities: a.string(),
+        cost: a.float().required(),
+        suggested_questions: a.string(),
+        is_public: a.integer().required(),
+        type: a.ref("Ai_agentsType").required(),
+        like_count: a.integer().required(),
+        total_interactions: a.integer().required(),
+        version_value_use: a.string()
+    }).identifier([
+        "id"
+    ]),
+    ChatsCreate_by: a.enum([
+        "AI",
+        "USER"
+    ]),
     Agent_versionStatus: a.enum([
         "CREATING",
         "PREPARED",
@@ -147,10 +152,6 @@ export const schema = configure({
         "UPDATING",
         "DELETING",
         "DISSOCIATED"
-    ]),
-    ChatsCreate_by: a.enum([
-        "AI",
-        "USER"
     ]),
     Ai_agentsType: a.enum([
         "ADMIN",

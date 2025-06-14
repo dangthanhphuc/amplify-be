@@ -58,11 +58,12 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     if (type) {
       filter.type = { eq: type };
     }
+
     const se =generateClient <Schema>();
     // ✅ Apply filter only if we have any filters, otherwise get all
     if (Object.keys(filter).length > 0) {
       result = await se.models.AiAgents.list({
-        filter: filter,
+        filter: {...filter, and: {is_public: { eq: 1 }}},
         limit: parseInt(limit),
         nextToken: nextToken || undefined,
         selectionSet: selectionSet
@@ -71,6 +72,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     } else {
       // Get all ai agents when no filters
       result = await amplifyClient.models.AiAgents.list({
+        filter: { is_public: { eq: 1 } }, // Default to public agents
         limit: parseInt(limit),
         nextToken: nextToken || undefined,
         selectionSet: selectionSet,

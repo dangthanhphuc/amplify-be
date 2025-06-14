@@ -42,10 +42,17 @@ export const handler : APIGatewayProxyHandlerV2 = async (event) => {
         const existingChat = await e.models.Chats.list({
             filter: {user_id: {eq: userId}},
             selectionSet: [
+                "id",
+                "create_at",
+                "create_by",
+                "raw_content", 
+                "user_id",  
+                "ai_agent_id",  
                 "ai_agent.icon",
                 "ai_agent.name",
-            ]
-        });
+                "ai_agent.version_value_use"
+            ] 
+        } as any);
 
         return {
             statusCode: 200,

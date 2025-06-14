@@ -47,7 +47,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     let body: any;
     if (event.body) {
       body =
-        typeof event.body === "string" ? JSON.parse(event.body) : event.body;    } else {
+        typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+    } else {
       body = event;
     }
 
@@ -110,7 +111,9 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
           required_parameters: Object.keys(requiredParams),
         }),
       };
-    }    // 1. Create knowledgeBase
+    }
+
+    // 1. Create knowledgeBase
     logger.info("🔄 Step 1: Creating Knowledge Base...");
     
     const nameKnowledgeBase = `knowledge-base-${randomUUID().toString()}`;
@@ -130,7 +133,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
           connectionString:
             "https://phuc-create-agent-iag21ns.svc.aped-4627-b74a.pinecone.io",
           credentialsSecretArn:
-            "arn:aws:secretsmanager:us-east-1:842676020404:secret:prod/bedrock/pinecone-phuc-tqruE8",
+            "arn:aws:secretsmanager:us-east-1:842676020404:secret/prod/bedrock/pinecone-phuc-tqruE8",
           namespace: nameKnowledgeBase,
           fieldMapping: {
             textField: "text",
@@ -347,7 +350,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       sys_prompt: instruction,
       knowledge_base_url: knowledgeBaseUrl,
       suggested_questions: JSON.stringify(suggestedQuestions || []),
-      is_public: 1,
+      is_public: 0,
       type: type,
       model: createAgentResponse.agent?.foundationModel,
       icon: icon,
@@ -369,7 +372,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       sys_prompt: instruction || "",
       knowledge_base_url: knowledgeBaseUrl || "",
       suggested_questions: JSON.stringify(suggestedQuestions || []),
-      is_public: 1,
+      is_public: 0,
       type: type || "EXPERT",
       model: createAgentResponse.agent?.foundationModel || "",
       icon: icon || "public-images/ai.png",

@@ -315,30 +315,6 @@ const chatWithAgentUrl = backend.chatWithAgentFnc.resources.lambda.addFunctionUr
   invokeMode: InvokeMode.RESPONSE_STREAM,
 });
 
-const createAgentAdminUrl = backend.createAgentExpertFnc.resources.lambda.addFunctionUrl({
-  cors: {
-    allowedOrigins: ['*'],
-    allowedMethods: [HttpMethod.POST, HttpMethod.GET],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization', 
-      'X-Requested-With',
-      'Accept',
-      'Origin'
-    ],
-    exposedHeaders: [
-      'X-Request-ID',
-      'X-Response-Time', 
-      'X-Total-Tokens',
-      'X-Session-ID',
-    ],
-    allowCredentials: false, 
-    maxAge: Duration.seconds(86400)
-  },
-  authType: FunctionUrlAuthType.NONE,
-  invokeMode: InvokeMode.RESPONSE_STREAM,
-});
-
 // bedrock:CreateKnowledgeBase
 backend.testFnc.resources.lambda.addToRolePolicy(new PolicyStatement({
   effect: Effect.ALLOW,
@@ -356,7 +332,6 @@ backend.addOutput({
   custom: {
     functionUrls: {
       chatWithAgent: chatWithAgentUrl.url,
-      createAgentAdmin: createAgentAdminUrl.url
     }
   }
 });

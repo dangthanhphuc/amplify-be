@@ -87,8 +87,19 @@ export async function syncDataFromBebrock(
     );
     const bedrockAliases = await listAgentAliasFormBebrock(
       bedrockClient,
-      aiAgentId
+      aiAgentId 
     );
+
+    const sortedAliases = bedrockAliases.sort((a, b) => { 
+      const dateA = new Date(a.updatedAt); 
+      const dateB = new Date(b.updatedAt);
+      console.log("dateA: ", dateA, "dateB: ", dateB);
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    const aliasIdNewest = sortedAliases[0];
+    console.log("Alias newest: ", JSON.stringify(aliasIdNewest, null, 2));
+
     console.log("✅ [syncDataFromBebrock] Agent Aliases retrieved:", {
       aliasCount: bedrockAliases.length,
       aliases: bedrockAliases.map((alias) => ({
@@ -130,6 +141,7 @@ export async function syncDataFromBebrock(
         last_version:
           bedrockAgent.agentVersion || existingAgent.data.last_version,
         model: bedrockAgent.foundationModel || existingAgent.data.model,
+        version_value_use: aliasIdNewest.id,
       });
       console.log("Agent updated result: ", JSON.stringify(agentResult, null, 2));
 
@@ -412,11 +424,11 @@ export async function getAllAgentsAndConvertAiAgent(
               versionValue: alias.agentAliasId || "",
               description: alias.description || "",
               createdAt: alias.createdAt
-                ? alias.createdAt.toISOString().replace(/\.\d{3}Z$/, "")
-                : new Date().toISOString().replace(/\.\d{3}Z$/, ""),
+                ? alias.createdAt.toISOString()
+                : new Date().toISOString(),
               updateAt: alias.updatedAt
-                ? alias.updatedAt.toISOString().replace(/\.\d{3}Z$/, "")
-                : new Date().toISOString().replace(/\.\d{3}Z$/, ""),
+                ? alias.updatedAt.toISOString()
+                : new Date().toISOString(),
             })
           ) ?? [])
         );

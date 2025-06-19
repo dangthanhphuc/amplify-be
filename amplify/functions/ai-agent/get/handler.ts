@@ -6,7 +6,7 @@ import { Schema } from "../../../data/resource";
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   const queryParams = event.queryStringParameters || {};
-  const { type, creatorId, limit = "20", nextToken } = queryParams;
+  const { agentId, type, creatorId, limit = "20", nextToken } = queryParams;
 
   if (type && type !== "ADMIN" && type !== "EXPERT" && type !== "OUTSIDE") {
     return {
@@ -20,6 +20,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 
   // Clients
   const amplifyClient = await getAmplifyClient(env);
+  const se = generateClient<Schema>();
 
   try {
     let result;
@@ -61,7 +62,31 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 
     const se =generateClient <Schema>();
     // ✅ Apply filter only if we have any filters, otherwise get all
-    if (Object.keys(filter).length > 0) {
+    if (agentId) {
+      // If agentId is provided, fetch a specific agent
+      result = await se.models.AiAgents.get({
+        id: agentId}, 
+        {
+          selectionSet: selectionSet
+        }
+      );
+      if (!result) {
+        return {
+          statusCode: 404,
+          body: JSON.stringify({
+            message: "Ai agent not found",
+          }),
+        };
+      }
+      console.log("Fetched specific agent:", result);
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: "Ai agent retrieved successfully",
+          data: result,
+        }),
+      };
+    } else if (Object.keys(filter).length > 0) {
       result = await se.models.AiAgents.list({
         filter: {...filter, and: {is_public: { eq: 1 }}},
         limit: parseInt(limit),

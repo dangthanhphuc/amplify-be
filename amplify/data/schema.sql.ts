@@ -67,16 +67,6 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "chats": a.model({
-        id: a.string().required(),
-        raw_content: a.string(),
-        create_at: a.datetime(),
-        user_id: a.string(),
-        ai_agent_id: a.string(),
-        create_by: a.ref("ChatsCreate_by")
-    }).identifier([
-        "id"
-    ]),
     "report_categories": a.model({
         id: a.string().required(),
         name: a.string().required(),
@@ -141,9 +131,15 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    ChatsCreate_by: a.enum([
-        "AI",
-        "USER"
+    "chats": a.model({
+        id: a.string().required(),
+        raw_content: a.string(),
+        create_at: a.datetime(),
+        user_id: a.string(),
+        ai_agent_id: a.string(),
+        create_by: a.ref("ChatsCreate_by")
+    }).identifier([
+        "id"
     ]),
     Agent_versionStatus: a.enum([
         "CREATING",
@@ -152,6 +148,10 @@ export const schema = configure({
         "UPDATING",
         "DELETING",
         "DISSOCIATED"
+    ]),
+    ChatsCreate_by: a.enum([
+        "AI",
+        "USER"
     ]),
     Ai_agentsType: a.enum([
         "ADMIN",

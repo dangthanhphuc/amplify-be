@@ -37,6 +37,7 @@ export async function waitForResourceStatus<T>(
       }
 
       if (status === "FAILED") {
+        console.log("Reason for failure:", JSON.stringify(resource, null, 2));
         throw new Error(`❌ ${resourceName} ${resourceId} failed`);
       }
 

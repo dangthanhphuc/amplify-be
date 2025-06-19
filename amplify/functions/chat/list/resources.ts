@@ -1,6 +1,6 @@
 import { defineFunction } from "@aws-amplify/backend";
 
-export const listChatByUserIdFnc = defineFunction({
-    name: "listChatByUserIdFnc",
+export const listChatFnc = defineFunction({
+    name: "listChatFnc",
     timeoutSeconds: 60
 })

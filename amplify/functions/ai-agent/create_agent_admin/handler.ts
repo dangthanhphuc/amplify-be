@@ -110,10 +110,31 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
           required_parameters: Object.keys(requiredParams),
         }),
       };
-    }    // 1. Create knowledgeBase
+    }
+
+    // Transform name to AWS Bedrock compatible format
+    const bedrockCompatibleName =
+      name
+        .replace(/[^a-zA-Z0-9\-_\s]/g, "") // Remove invalid characters
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[-_]+/g, "-") // Replace multiple hyphens/underscores with single hyphen
+        .replace(/^[-_]+|[-_]+$/g, "") // Remove leading/trailing hyphens
+        .toLowerCase()
+        .substring(0, 100) // Truncate to 100 characters
+        .replace(/[-_]+$/, "") + `_${creatorId}` || // Remove trailing hyphens after truncation
+      `ai-agent-${Date.now()}`; // Fallback if empty
+
+    // Validate transformed name
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9\-_]*$/.test(bedrockCompatibleName)) {
+      throw new Error(
+        `Transformed name "${bedrockCompatibleName}" is still invalid for AWS Bedrock`
+      );
+    }
+
+    // 1. Create knowledgeBase
     logger.info("🔄 Step 1: Creating Knowledge Base...");
-    
-    const nameKnowledgeBase = `knowledge-base-${randomUUID().toString()}`;
+
+    const nameKnowledgeBase = `${bedrockCompatibleName}-${randomUUID().toString()}`;
     const createKnowledgeBaseRequest: CreateKnowledgeBaseRequest = {
       name: nameKnowledgeBase,
       roleArn: "arn:aws:iam::842676020404:role/BedrockAIAgentRole", // Revert back to existing role
@@ -131,7 +152,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
             "https://phuc-create-agent-iag21ns.svc.aped-4627-b74a.pinecone.io",
           credentialsSecretArn:
             "arn:aws:secretsmanager:us-east-1:842676020404:secret:prod/bedrock/pinecone-phuc-tqruE8",
-          namespace: nameKnowledgeBase,
+          namespace: bedrockCompatibleName,
           fieldMapping: {
             textField: "text",
             metadataField: "metadata",
@@ -142,7 +163,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     const createKnowledgeBaseResponse = await bedrockClient.send(
       new CreateKnowledgeBaseCommand(createKnowledgeBaseRequest)
     );
-
     const knowledgeBaseId =
       createKnowledgeBaseResponse.knowledgeBase?.knowledgeBaseId;
     if (!knowledgeBaseId) {
@@ -220,25 +240,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 
     // 2. Create Agent
     logger.info("🔄 Step 7: Creating Bedrock Agent...");
-
-    // Transform name to AWS Bedrock compatible format
-    const bedrockCompatibleName =
-      name
-        .replace(/[^a-zA-Z0-9\-_\s]/g, "") // Remove invalid characters
-        .replace(/\s+/g, "-") // Replace spaces with hyphens
-        .replace(/[-_]+/g, "-") // Replace multiple hyphens/underscores with single hyphen
-        .replace(/^[-_]+|[-_]+$/g, "") // Remove leading/trailing hyphens
-        .toLowerCase()
-        .substring(0, 100) // Truncate to 100 characters
-        .replace(/[-_]+$/, "") || // Remove trailing hyphens after truncation
-      `ai-agent-${Date.now()}`; // Fallback if empty
-
-    // Validate transformed name
-    if (!/^[a-zA-Z0-9][a-zA-Z0-9\-_]*$/.test(bedrockCompatibleName)) {
-      throw new Error(
-        `Transformed name "${bedrockCompatibleName}" is still invalid for AWS Bedrock`
-      );
-    }
 
     // Validate description length
     if (description && description.length > 200) {

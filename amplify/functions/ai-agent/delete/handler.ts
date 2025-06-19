@@ -19,6 +19,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   }
 
   const amplifyClient = await getAmplifyClient(env);
+  
   try {
     const agentExist = await amplifyClient.models.AiAgents.get({
       id: agentId,

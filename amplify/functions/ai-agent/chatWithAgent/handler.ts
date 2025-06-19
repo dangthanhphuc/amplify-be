@@ -86,7 +86,7 @@ export const handler = awslambda.streamifyResponse(async (event, responseStream)
           userId: userId,
           createdby: "AI",
           rawContent: completion,
-          createAt: getVietnamTimestamp()
+          createAt: getVietnamTimestamp(1000)
         }
         const resultByUser = await createChat(amplifyClient, chatByAi);
         console.log("Chat user saved successfully:", resultByUser);

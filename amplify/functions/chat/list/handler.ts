@@ -7,14 +7,14 @@ import { generateClient } from "aws-amplify/data";
 export const handler : APIGatewayProxyHandlerV2 = async (event) => {
 
     const queryParams = event.queryStringParameters || {};
-    const {userId} = queryParams;
+    const {userId, agentId} = queryParams;
 
-    if (!userId) {
+    if (!userId || !agentId) {
         return {
             statusCode: 400,
             body: JSON.stringify({
                 message: "Bad Request",
-                error: "Missing required query parameter: userId"
+                error: "Missing required query parameter: userId or agentId"
             })
         };  
     }
@@ -27,20 +27,26 @@ export const handler : APIGatewayProxyHandlerV2 = async (event) => {
 
         const existingUser = await amplifyClient.models.Users.get({
             id: userId
-        })
+        });
+        const existingAgent = await amplifyClient.models.AiAgents.get({
+            id: agentId
+        });
 
-        if (!existingUser.data) {
+        if (!existingUser.data || !existingAgent.data) {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
                     message: "Not Found",
-                    error: `User with ID ${userId} does not exist`
+                    error: `User with ID ${userId} does not exist or Agent with ID ${agentId} does not exist`
                 })
             };
         }
 
         const existingChat = await e.models.Chats.list({
-            filter: {user_id: {eq: userId}},
+            filter: {
+                user_id: {eq: userId},
+                ai_agent_id: {eq: agentId}
+            },
             selectionSet: [
                 "id",
                 "create_at",

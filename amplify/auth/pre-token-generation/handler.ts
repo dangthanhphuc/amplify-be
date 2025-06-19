@@ -8,7 +8,7 @@ import { generateClient } from "aws-amplify/data";
 
 export const handler: PreTokenGenerationTriggerHandler = async (event) => {
   console.log("Pre Token Generation Trigger Event: ", JSON.stringify(event, null, 2));
-  console.log("User Attributes:", JSON.stringify(event.request.userAttributes));
+  console.log("User Attributes:", JSON.stringify(event.request.userAttributes, null, 2));
 
   try {
     // Clients
@@ -19,13 +19,13 @@ export const handler: PreTokenGenerationTriggerHandler = async (event) => {
     const { sub, name, email, email_verified } = event.request.userAttributes;
     
     // Check if user already exists in RDS
-    const existingUser = await amplifyClient.models.Users.get({ id: sub });
+    const existingUser = await s.models.Users.get({ id: sub });
     
     if (!existingUser.data) {
       console.log(`Creating new user in RDS for sub: ${sub}`);
       
       // Create user in RDS for both regular and federated sign-ins
-      await amplifyClient.models.Users.create({
+      const userCreated = await s.models.Users.create({
         id: sub,
         email: email,
         name: name || email, // Fallback to email if name not provided
@@ -49,8 +49,34 @@ export const handler: PreTokenGenerationTriggerHandler = async (event) => {
       }
 
       console.log("User created successfully in RDS");
+      // Set response for token claims
+      event.response = {
+        claimsOverrideDetails: {
+          groupOverrideDetails: {
+            groupsToOverride: ["USERS"], // Add user to USERS group in token
+          },
+          claimsToAddOrOverride: {
+            name: userCreated.data?.name ?? "",
+            email: userCreated.data?.email ?? "",
+            profile_image: userCreated.data?.profile_image ?? "",
+          },
+        },
+      };
     } else {
       console.log(`User ${sub} already exists in RDS`);
+      // Set response for token claims
+      event.response = {
+        claimsOverrideDetails: {
+          groupOverrideDetails: {
+            groupsToOverride: ["USERS"], // Add user to USERS group in token
+          },
+          claimsToAddOrOverride: {
+            name: existingUser.data.name ?? "",
+            email: existingUser.data.email ?? "",
+            profile_image: existingUser.data.profile_image ?? "",
+          },
+        },
+      };
     }
 
   } catch (error) {
@@ -58,17 +84,5 @@ export const handler: PreTokenGenerationTriggerHandler = async (event) => {
     // Don't throw error to avoid blocking authentication
   }
 
-  // Set response for token claims
-  event.response = {
-    claimsOverrideDetails: {
-      groupOverrideDetails: {
-        groupsToOverride: ["USERS"], // Add user to USERS group in token
-      },
-      claimsToAddOrOverride: {
-        app_metadata: "amplify_v2",
-      },
-    },
-  };
-  
   return event;
 };  

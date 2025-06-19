@@ -53,7 +53,9 @@ import { likeFnc } from './functions/user-like/like/resources';
 import { createAgentExpertFnc } from './functions/ai-agent/create_agent_admin/resources';
 import { syncDataFromBedrockFnc } from './functions/ai-agent/syncDataFromBedrock/resources';
 import { syncAllDataFromBedrockFnc } from './functions/ai-agent/syncAllDataFromBedrock/resources';
-import { listChatByUserIdFnc } from './functions/chat/list/resources';
+import { listChatFnc,  } from './functions/chat/list/resources';
+import { listChatByUserIdFnc } from './functions/chat/listChatByUserId/resources';
+import { updateKnowledgeBaseFnc } from './functions/ai-agent/update-knowledge-base/resources';
 
 
 // Tạo __dirname cho ES modules
@@ -76,6 +78,7 @@ export const backend = defineBackend({
   getAgentsFnc,
   createAgentOutsideFnc,
   createAgentExpertFnc,
+  updateKnowledgeBaseFnc,
   updateAgentFnc,
   deleteAgentFnc,
   syncDataFromBedrockFnc,
@@ -102,6 +105,7 @@ export const backend = defineBackend({
   deleteReportCategoryFnc,
 
   // Chat
+  listChatFnc,
   listChatByUserIdFnc,
 
   // Agent Categories

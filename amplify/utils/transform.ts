@@ -73,9 +73,12 @@ import { getBedrockClient } from "./clients";
 //   return aiAgents;
 // }
 
-export function getVietnamTimestamp() : Date {
+export function getVietnamTimestamp(timeAdd? : number) : Date {
   const now = new Date();
   const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
   const vietnamTime = new Date(utc + (7 * 3600000)); // UTC+7
+  if (timeAdd) {
+    vietnamTime.setTime(vietnamTime.getTime() + timeAdd);
+  }
   return vietnamTime;
 }

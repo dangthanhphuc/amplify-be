@@ -45,6 +45,7 @@ export function createRestApiStack(backend: any) {
   )
   const lambdaForCreateAgentOutside = createLambdaIntegrationResponse(backend.createAgentOutsideFnc.resources.lambda);
   const lambdaForCreateAgentExpert = createLambdaIntegrationResponse(backend.createAgentExpertFnc.resources.lambda);
+  const lambdaForUpdateKnowledgeBase = createLambdaIntegrationResponse(backend.updateKnowledgeBaseFnc.resources.lambda);
   const lamdbaForDeleteAgent = createLambdaIntegrationResponse(backend.deleteAgentFnc.resources.lambda);
   const lambdaForUpdateAgent = createLambdaIntegrationResponse(backend.updateAgentFnc.resources.lambda);
 
@@ -65,6 +66,9 @@ export function createRestApiStack(backend: any) {
   );
 
 
+  const lambdaForListChat = createLambdaIntegrationResponse(
+    backend.listChatFnc.resources.lambda
+  );
   const lambdaForListChatByUserId = createLambdaIntegrationResponse(
     backend.listChatByUserIdFnc.resources.lambda
   );
@@ -188,6 +192,7 @@ export function createRestApiStack(backend: any) {
   agentByTypeOutsideResource.addMethod("POST", lambdaForCreateAgentOutside);
   const agentByTypeExpertResource = agentsResource.addResource("expert");
   agentByTypeExpertResource.addMethod("POST", lambdaForCreateAgentExpert);
+  agentByTypeExpertResource.addMethod("PUT", lambdaForUpdateKnowledgeBase);
   const agentByIdResource = agentsResource.addResource("{agentId}");
   agentByIdResource.addMethod("DELETE", lamdbaForDeleteAgent);
   agentByIdResource.addMethod("PUT", lambdaForUpdateAgent);
@@ -256,8 +261,10 @@ export function createRestApiStack(backend: any) {
 
   // Chats
   const chatResource = restAPI.root.addResource("chats");
-  chatResource.addMethod("GET", lambdaForListChatByUserId);
-
+  chatResource.addMethod("GET", lambdaForListChat);
+  const chatByUserIdResource = chatResource.addResource("{userId}");
+  chatByUserIdResource.addMethod("GET", lambdaForListChatByUserId);
+  
   // Test resource
   const testResource = restAPI.root.addResource("test");
   const testFnc = new LambdaIntegration(backend.testFnc.resources.lambda);

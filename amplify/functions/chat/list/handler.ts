@@ -1,5 +1,5 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
-import {env} from "$amplify/env/listChatByUserIdFnc";
+import {env} from "$amplify/env/listChatFnc";
 import { getAmplifyClient } from "../../../utils/clientUtil";
 import { Schema } from "../../../data/resource";
 import { generateClient } from "aws-amplify/data";

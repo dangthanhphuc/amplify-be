@@ -1,12 +1,10 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import {
-  getAmplifyClient,
-  initializeAmplifyClient,
+  getAmplifyClient
 } from "../../../utils/clientUtil";
 import { env } from "$amplify/env/updateAgentFnc";
-import { generateClient } from "aws-amplify/data";
-import { Schema } from "../../../data/resource";
 import { getVietnamTimestamp } from "../../../utils/transform";
+
 
 const fieldMapping: { [key: string]: string } = {
   name: "name",
@@ -19,8 +17,6 @@ const fieldMapping: { [key: string]: string } = {
   status: "status",
   likeCount: "like_count",
   totalInteractions: "total_interactions",
-  creatorId: "creator_id",
-  knowledgeBaseUrl: "knowledge_base_url",
   sysPrompt: "sys_prompt",
   model: "model",
   capabilities: "capabilities",
@@ -88,7 +84,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       ...updateData,
       updated_at: getVietnamTimestamp(),
     };
-
     // Execute GraphQL mutation
     const result = await amplifyClient.models.AiAgents.update(updateInput);
 

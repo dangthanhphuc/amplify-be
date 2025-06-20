@@ -25,7 +25,7 @@ import {
 } from "../../../helper/waitBebrock";
 import { Schema } from "../../../data/resource";
 import { generateClient } from "aws-amplify/data";
-import { getAmplifyClient } from "../../../utils/clientUtil";
+import { getAmplifyClient, initializeAmplifyClient } from "../../../utils/clientUtil";
 import { env } from "$amplify/env/createAgentExpertFnc";
 
 const logger = {
@@ -38,9 +38,10 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   console.log("Full event:", JSON.stringify(event));
 
   // Client
+  await initializeAmplifyClient(env);
   const bedrockClient = getBedrockClient();
-  const amplifyClient = await getAmplifyClient(env);
-  const s = generateClient<Schema>();
+  const amplifyClient = generateClient<Schema>();
+
 
   try {
     // Parse event body
@@ -134,7 +135,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     // 1. Create knowledgeBase
     logger.info("🔄 Step 1: Creating Knowledge Base...");
 
-    const nameKnowledgeBase = `${bedrockCompatibleName}-${randomUUID().toString()}`;
+    const nameKnowledgeBase = `${bedrockCompatibleName}-knowledge-base`;
     const createKnowledgeBaseRequest: CreateKnowledgeBaseRequest = {
       name: nameKnowledgeBase,
       roleArn: "arn:aws:iam::842676020404:role/BedrockAIAgentRole", // Revert back to existing role
@@ -152,7 +153,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
             "https://phuc-create-agent-iag21ns.svc.aped-4627-b74a.pinecone.io",
           credentialsSecretArn:
             "arn:aws:secretsmanager:us-east-1:842676020404:secret:prod/bedrock/pinecone-phuc-tqruE8",
-          namespace: bedrockCompatibleName,
+          namespace: `${bedrockCompatibleName}_${creatorId}`,
           fieldMapping: {
             textField: "text",
             metadataField: "metadata",
@@ -160,9 +161,11 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
         },
       },
     };
+    
     const createKnowledgeBaseResponse = await bedrockClient.send(
       new CreateKnowledgeBaseCommand(createKnowledgeBaseRequest)
     );
+
     const knowledgeBaseId =
       createKnowledgeBaseResponse.knowledgeBase?.knowledgeBaseId;
     if (!knowledgeBaseId) {
@@ -191,7 +194,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
         },
       })
     );
-
     const dataSourceId = createDataSourceResponse.dataSource?.dataSourceId;
     if (!dataSourceId) {
       throw new Error("Failed to create data source - no ID returned");
@@ -333,8 +335,9 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 
     // Step 15: Create Agent on rds
     logger.info("🔄 Step 15: Creating Agent in RDS...");
+  
     console.log("Agent data to be saved in RDS:", {
-      id: createAgentResponse.agent?.agentId,
+      id: agentId,
       name: name,
       introduction: introduction,
       description: createAgentResponse.agent?.description,
@@ -346,7 +349,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       like_count: 0,
       creator_id: creatorId,
       sys_prompt: instruction,
-      knowledge_base_url: knowledgeBaseUrl,
       suggested_questions: JSON.stringify(suggestedQuestions || []),
       is_public: 1,
       type: type,
@@ -356,7 +358,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     });
 
     const agentResult = await amplifyClient.models.AiAgents.create({
-      id: createAgentResponse.agent?.agentId,
+      id: agentId,
       name: name || "",
       introduction: introduction || "",
       description: createAgentResponse.agent?.description || "",
@@ -368,7 +370,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       like_count: 0,
       creator_id: creatorId || "1",
       sys_prompt: instruction || "",
-      knowledge_base_url: knowledgeBaseUrl || "",
       suggested_questions: JSON.stringify(suggestedQuestions || []),
       is_public: 1,
       type: type || "EXPERT",
@@ -380,6 +381,13 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       "Agent created in RDS:",
       JSON.stringify(agentResult, null, 2)
     );
+
+    const knowledgeBaseResult = await amplifyClient.models.KnowledgeBase.create({
+      id: knowledgeBaseId,
+      ai_agent_id: agentId,
+      data_source_url: knowledgeBaseUrl,
+      creator_id: creatorId,
+    });
 
     const agentVersion = await amplifyClient.models.AgentVersion.create({
       ai_agent_id: agentId,

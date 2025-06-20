@@ -1,12 +1,28 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { getBedrockClient } from "../../../utils/clients";
+import { GetAgentCommand, GetKnowledgeBaseCommand, StartIngestionJobCommand } from "@aws-sdk/client-bedrock-agent";
 
 export const handler : APIGatewayProxyHandlerV2 = async (event) => {
+
+    const requestBody = JSON.parse(event.body || "{}");
+    const {agentId, publishVersion} = requestBody;
     
     // Clients
     const bedrockAgentClient = getBedrockClient();
 
     try {
+        
+        // 1. Get agent existing
+        const getAgentResponse = await bedrockAgentClient.send(new GetAgentCommand({
+            agentId
+        }));
+        // const knowledgeBaseresponse = await bedrockAgentClient.send(new GetKnowledgeBaseCommand({
+
+        // }))
+
+        // const startIngestionJobResponse = await bedrockAgentClient.send(new StartIngestionJobCommand({
+            
+        // }));    
 
         return {
             statusCode: 200,

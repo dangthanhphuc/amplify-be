@@ -107,6 +107,16 @@ export const schema = configure({
         "ai_agent_id",
         "version_value"
     ]),
+    "chats": a.model({
+        id: a.string().required(),
+        raw_content: a.string(),
+        create_at: a.datetime(),
+        user_id: a.string(),
+        ai_agent_id: a.string(),
+        create_by: a.ref("ChatsCreate_by")
+    }).identifier([
+        "id"
+    ]),
     "ai_agents": a.model({
         id: a.string().required(),
         name: a.string().required(),
@@ -117,7 +127,6 @@ export const schema = configure({
         last_version: a.string(),
         status: a.string().required(),
         creator_id: a.string().required(),
-        knowledge_base_url: a.string(),
         sys_prompt: a.string(),
         model: a.string(),
         capabilities: a.string(),
@@ -131,15 +140,17 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "chats": a.model({
+    "knowledge_base": a.model({
         id: a.string().required(),
-        raw_content: a.string(),
-        create_at: a.datetime(),
-        user_id: a.string(),
-        ai_agent_id: a.string(),
-        create_by: a.ref("ChatsCreate_by")
+        data_source_url: a.string().required(),
+        ai_agent_id: a.string().required(),
+        creator_id: a.string().required(),
+        created_at: a.datetime(),
+        updated_at: a.datetime()
     }).identifier([
-        "id"
+        "id",
+        "data_source_url",
+        "ai_agent_id"
     ]),
     Agent_versionStatus: a.enum([
         "CREATING",

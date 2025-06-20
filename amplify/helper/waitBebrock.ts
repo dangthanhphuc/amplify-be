@@ -33,11 +33,14 @@ export async function waitForResourceStatus<T>(
 
       if (targetStatuses.includes(status || "")) {
         logger.info(`✅ ${resourceName} ${resourceId} reached target status: ${status}`);
+        logger.info(`Waiting for ${resourceName} ${resourceId} to be ready successfully: `, JSON.stringify(resource, null, 2));
         return status || "";
       }
 
       if (status === "FAILED") {
         console.log("Reason for failure:", JSON.stringify(resource, null, 2));
+        logger.error(`❌ ${resourceName} ${resourceId} failed with status: ${status}`);
+        logger.error(`Waiting for ${resourceName} ${resourceId} to be ready failed: `, JSON.stringify(resource, null, 2));
         throw new Error(`❌ ${resourceName} ${resourceId} failed`);
       }
 

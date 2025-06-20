@@ -75,7 +75,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       is_public: 0,
       type: "OUTSIDE",
       status: "ACTIVE",
-      knowledge_base_url: "",
       sys_prompt: "",
       suggested_questions: JSON.stringify([]),
       icon: "",

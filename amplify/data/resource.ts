@@ -59,6 +59,7 @@ const sqlSchema = generatedSqlSchema
     ["agent_version", "AgentVersion"],
     ["user_likes", "UserLikes"],
     ["users", "Users"],
+    ["knowledge_base", "KnowledgeBase"],
   ])
   .setRelationships((models) => [
     models.Users.relationships({

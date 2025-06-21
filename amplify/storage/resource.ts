@@ -11,6 +11,7 @@ export const storageForProject = defineStorage({
         ],
         'knowledge-base/{entity_id}/*': [
             allow.entity("identity").to(['read', 'write', 'delete']),
+            allow.groups(["USERS"]).to(['read', 'write', 'delete']),
         ],
         'public-images/*': [
             allow.guest.to(['read']),

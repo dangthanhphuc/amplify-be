@@ -8,23 +8,20 @@ import { getVietnamTimestamp } from "../../../utils/transform";
 
 const fieldMapping: { [key: string]: string } = {
   name: "name",
-//   icon: "icon",
   introduction: "introduction",
   description: "description",
   foreword: "foreword",
   lastVersion: "last_version",
-  last_version: "last_version",
   status: "status",
   likeCount: "like_count",
   totalInteractions: "total_interactions",
   sysPrompt: "sys_prompt",
   model: "model",
   capabilities: "capabilities",
-//   aliasIds: "alias_ids",
   cost: "cost",
   suggestedQuestions: "suggested_questions",
+  categories: "categories",
   isPublic: "is_public",
-  type: "type",
 };
 
 

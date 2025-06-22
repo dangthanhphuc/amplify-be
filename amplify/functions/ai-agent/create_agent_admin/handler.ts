@@ -376,6 +376,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       model: createAgentResponse.agent?.foundationModel || "",
       icon: icon || "public-images/ai.png",
       capabilities: JSON.stringify(capabilities || []),
+      version_value_use: createAliasResponse.agentAlias?.agentAliasId || "",
     });
     console.log(
       "Agent created in RDS:",

@@ -47,7 +47,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       "categories.agent_category.name",
       "categories.agent_category.id",
       "versions.*",
-      "version_value_use"
+      "version_value_use",
+      "knowledge_base.data_source_url"
     ] as any;
 
     // ✅ Build filter dynamically based on provided parameters

@@ -388,6 +388,10 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       data_source_url: knowledgeBaseUrl,
       creator_id: creatorId,
     });
+    console.log(
+      "Knowledge base created in RDS:",
+      JSON.stringify(knowledgeBaseResult, null, 2)
+    );
 
     const agentVersion = await amplifyClient.models.AgentVersion.create({
       ai_agent_id: agentId,
@@ -403,6 +407,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       "Agent version created in RDS:",
       JSON.stringify(agentVersion, null, 2)
     );
+
 
     for (const categoryId of categoryIds) {
       const existingCategory = await amplifyClient.models.AgentCategories.get(

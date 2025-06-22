@@ -73,8 +73,12 @@ const sqlSchema = generatedSqlSchema
       categories: a.hasMany("AiCategories", "ai_agent_id"),
       versions: a.hasMany("AgentVersion", "ai_agent_id"),
       chats: a.hasMany("Chats", "ai_agent_id"),
+      knowledge_base: a.hasOne("KnowledgeBase", "ai_agent_id"),
       // user_likes: a.hasMany("UserLikes", "ai_agent_id"),
       // ai_revirews: a.hasMany("AiReviews", "ai_agent_id"),
+    }),
+    models.KnowledgeBase.relationships({
+      ai_agent: a.belongsTo("AiAgents", "ai_agent_id"),
     }),
     models.AiCategories.relationships({
       agent: a.belongsTo("AiAgents", "ai_agent_id"),
